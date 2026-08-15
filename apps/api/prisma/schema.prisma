@@ -13,12 +13,59 @@ enum Role {
   GATEKEEPER
 }
 
+enum EventStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  role         Role     @default(CUSTOMER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  passwordHash    String
+  role            Role     @default(CUSTOMER)
+  organizedEvents Event[]  @relation("OrganizerEvents")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Event {
+  id           String      @id @default(cuid())
+  tmdbMovieId  Int?
+  title        String
+  overview     String?
+  posterUrl    String?
+  startsAt     DateTime
+  venueName    String
+  venueAddress String?
+  price        Decimal     @db.Decimal(10, 2)
+  capacity     Int
+  status       EventStatus @default(DRAFT)
+
+  organizerId String
+  organizer   User   @relation("OrganizerEvents", fields: [organizerId], references: [id], onDelete: Restrict)
+  seats       Seat[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizerId])
+  @@index([startsAt])
+  @@index([status, startsAt])
+}
+
+model Seat {
+  id      String @id @default(cuid())
+  eventId String
+  row     String
+  number  Int
+  label   String
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, row, number])
+  @@index([eventId])
 }
