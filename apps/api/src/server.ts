@@ -4,6 +4,7 @@ import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { eventsRouter } from "./modules/events/events.routes.js";
+import { catalogRouter } from "./modules/catalog/catalog.routes.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(
 app.use(express.json());
 app.use("/auth", authRouter);
 app.use("/events", eventsRouter);
+app.use("/catalog", catalogRouter);
 
 app.get("/health", async (_request, response) => {
   try {
