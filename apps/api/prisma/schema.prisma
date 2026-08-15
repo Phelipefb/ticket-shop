@@ -19,15 +19,36 @@ enum EventStatus {
   CANCELLED
 }
 
+enum ReservationStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  EXPIRED
+  CANCELLED
+  PAYMENT_DECLINED
+}
+
+enum PaymentStatus {
+  APPROVED
+  DECLINED
+}
+
+enum TicketStatus {
+  ACTIVE
+  USED
+  VOID
+}
+
 model User {
-  id              String   @id @default(cuid())
-  name            String
-  email           String   @unique
-  passwordHash    String
-  role            Role     @default(CUSTOMER)
-  organizedEvents Event[]  @relation("OrganizerEvents")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               String        @id @default(cuid())
+  name             String
+  email            String        @unique
+  passwordHash     String
+  role             Role          @default(CUSTOMER)
+  organizedEvents  Event[]       @relation("OrganizerEvents")
+  reservations     Reservation[] @relation("CustomerReservations")
+  validatedTickets Ticket[]      @relation("TicketValidator")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 model Event {
@@ -44,8 +65,9 @@ model Event {
   status       EventStatus @default(DRAFT)
 
   organizerId String
-  organizer   User   @relation("OrganizerEvents", fields: [organizerId], references: [id], onDelete: Restrict)
+  organizer   User          @relation("OrganizerEvents", fields: [organizerId], references: [id], onDelete: Restrict)
   seats       Seat[]
+  reservations Reservation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -56,16 +78,71 @@ model Event {
 }
 
 model Seat {
-  id      String @id @default(cuid())
-  eventId String
-  row     String
-  number  Int
-  label   String
+  id           String        @id @default(cuid())
+  eventId      String
+  row          String
+  number       Int
+  label        String
 
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  event        Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  reservations Reservation[]
+  ticket       Ticket?
 
   createdAt DateTime @default(now())
 
   @@unique([eventId, row, number])
   @@index([eventId])
+}
+
+model Reservation {
+  id         String            @id @default(cuid())
+  eventId    String
+  seatId     String
+  customerId String
+  status     ReservationStatus @default(PENDING_PAYMENT)
+  expiresAt  DateTime
+
+  event    Event @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  seat     Seat  @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  customer User  @relation("CustomerReservations", fields: [customerId], references: [id], onDelete: Restrict)
+  payment  Payment?
+  ticket   Ticket?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([seatId, status])
+  @@index([customerId, status])
+  @@index([expiresAt])
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  reservationId String        @unique
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Ticket {
+  id            String       @id @default(cuid())
+  reservationId String       @unique
+  seatId        String       @unique
+  code          String       @unique
+  qrTokenHash   String       @unique
+  shareToken    String       @unique
+  status        TicketStatus @default(ACTIVE)
+  usedAt        DateTime?
+  validatedById String?
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  seat        Seat        @relation(fields: [seatId], references: [id], onDelete: Restrict)
+  validatedBy User?       @relation("TicketValidator", fields: [validatedById], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+
+  @@index([shareToken])
 }
