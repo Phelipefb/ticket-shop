@@ -50,3 +50,21 @@ export function authenticate(
     });
   }
 }
+
+export function authorize(...allowedRoles: UserRole[]) {
+  return (request: Request, response: Response, next: NextFunction) => {
+    if (!request.auth) {
+      return response.status(401).json({
+        message: "Usuário não autenticado.",
+      });
+    }
+
+    if (!allowedRoles.includes(request.auth.role)) {
+      return response.status(403).json({
+        message: "Você não tem permissão para esta ação.",
+      });
+    }
+
+    return next();
+  };
+}

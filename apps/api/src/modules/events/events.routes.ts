@@ -1,7 +1,112 @@
 import { Router } from "express";
 import { prisma } from "../../lib/prisma.js";
+import { z } from "zod";
+import { authenticate, authorize } from "../../middlewares/authenticate.js";
 
 export const eventsRouter = Router();
+
+const createEventSchema = z.object({
+  tmdbMovieId: z.number().int().positive().optional(),
+  title: z.string().trim().min(1).max(200),
+  overview: z.string().trim().max(2000).optional(),
+  posterUrl: z.string().url().optional(),
+  startsAt: z.coerce.date().refine((date) => date > new Date(), {
+    message: "A data da sessão deve estar no futuro.",
+  }),
+  venueName: z.string().trim().min(2).max(150),
+  venueAddress: z.string().trim().min(5).max(250).optional(),
+  price: z.coerce.number().positive().max(100000),
+  seatLayout: z.object({
+    rows: z.coerce.number().int().min(1).max(26),
+    seatsPerRow: z.coerce.number().int().min(1).max(50),
+  }),
+});
+
+eventsRouter.post(
+  "/",
+  authenticate,
+  authorize("ORGANIZER"),
+  async (request, response) => {
+    const validation = createEventSchema.safeParse(request.body);
+
+    if (!validation.success) {
+      return response.status(400).json({
+        message: "Dados inválidos.",
+        errors: validation.error.flatten().fieldErrors,
+      });
+    }
+
+    if (!request.auth) {
+      return response.status(401).json({
+        message: "Usuário não autenticado.",
+      });
+    }
+
+    const organizerId = request.auth.userId;
+    const {
+      tmdbMovieId,
+      title,
+      overview,
+      posterUrl,
+      startsAt,
+      venueName,
+      venueAddress,
+      price,
+      seatLayout,
+    } = validation.data;
+
+    const rows = Array.from({ length: seatLayout.rows }, (_, index) =>
+      String.fromCharCode(65 + index),
+    );
+
+    const seats = rows.flatMap((row) =>
+      Array.from({ length: seatLayout.seatsPerRow }, (_, index) => {
+        const number = index + 1;
+
+        return {
+          row,
+          number,
+          label: `${row}${number}`,
+        };
+      }),
+    );
+
+    const event = await prisma.$transaction(async (transaction) => {
+      const createdEvent = await transaction.event.create({
+        data: {
+          tmdbMovieId,
+          title,
+          overview,
+          posterUrl,
+          startsAt,
+          venueName,
+          venueAddress,
+          price,
+          capacity: seats.length,
+          status: "PUBLISHED",
+          organizerId,
+        },
+      });
+
+      await transaction.seat.createMany({
+        data: seats.map((seat) => ({
+          ...seat,
+          eventId: createdEvent.id,
+        })),
+      });
+
+      return createdEvent;
+    });
+
+    return response.status(201).json({
+      event: {
+        ...event,
+        price: event.price.toNumber(),
+        seatCount: seats.length,
+      },
+    });
+  },
+);
 
 eventsRouter.get("/", async (_request, response) => {
   const events = await prisma.event.findMany({
