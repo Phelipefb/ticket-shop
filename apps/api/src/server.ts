@@ -1,13 +1,13 @@
 import cors from "cors";
 import express from "express";
+import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
 
 const app = express();
-const port = Number(process.env.PORT ?? 3333);
 
 app.use(
   cors({
-    origin: process.env.WEB_URL ?? "http://localhost:3000",
+    origin: env.WEB_URL,
   }),
 );
 
@@ -33,6 +33,6 @@ app.get("/health", async (_request, response) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`API disponível em http://localhost:${port}`);
+app.listen(env.PORT, () => {
+  console.log(`API disponível em http://localhost:${env.PORT}`);
 });
