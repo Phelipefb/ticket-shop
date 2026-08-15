@@ -4,6 +4,7 @@ import { z } from "zod";
 import { prisma } from "../../lib/prisma.js";
 import jwt from "jsonwebtoken";
 import { env } from "../../config/env.js";
+import { authenticate } from "../../middlewares/authenticate.js";
 
 export const authRouter = Router();
 
@@ -113,4 +114,33 @@ authRouter.post("/login", async (request, response) => {
       role: user.role,
     },
   });
+});
+
+authRouter.get("/me", authenticate, async (request, response) => {
+  const userId = request.auth?.userId;
+
+  if (!userId) {
+    return response.status(401).json({
+      message: "Usuário não autenticado.",
+    });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    return response.status(404).json({
+      message: "Usuário não encontrado.",
+    });
+  }
+
+  return response.status(200).json({ user });
 });
