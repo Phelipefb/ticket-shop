@@ -7,6 +7,7 @@ import { eventsRouter } from "./modules/events/events.routes.js";
 import { catalogRouter } from "./modules/catalog/catalog.routes.js";
 import { reservationsRouter } from "./modules/reservations/reservations.routes.js";
 import { paymentsRouter } from "./modules/payments/payments.routes.js";
+import { ticketsRouter } from "./modules/tickets/tickets.routes.js";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/events", eventsRouter);
 app.use("/catalog", catalogRouter);
 app.use("/reservations", reservationsRouter);
 app.use("/payments", paymentsRouter);
+app.use("/tickets", ticketsRouter);
 
 app.get("/health", async (_request, response) => {
   try {
