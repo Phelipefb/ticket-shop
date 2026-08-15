@@ -42,3 +42,50 @@ eventsRouter.get("/", async (_request, response) => {
     events: formattedEvents,
   });
 });
+
+eventsRouter.get("/:eventId", async (request, response) => {
+  const { eventId } = request.params;
+
+  const event = await prisma.event.findFirst({
+    where: {
+      id: eventId,
+      status: "PUBLISHED",
+      startsAt: {
+        gte: new Date(),
+      },
+    },
+    select: {
+      id: true,
+      title: true,
+      overview: true,
+      posterUrl: true,
+      startsAt: true,
+      venueName: true,
+      venueAddress: true,
+      price: true,
+      capacity: true,
+      seats: {
+        orderBy: [{ row: "asc" }, { number: "asc" }],
+        select: {
+          id: true,
+          row: true,
+          number: true,
+          label: true,
+        },
+      },
+    },
+  });
+
+  if (!event) {
+    return response.status(404).json({
+      message: "Evento não encontrado ou indisponível.",
+    });
+  }
+
+  return response.status(200).json({
+    event: {
+      ...event,
+      price: event.price.toNumber(),
+    },
+  });
+});
