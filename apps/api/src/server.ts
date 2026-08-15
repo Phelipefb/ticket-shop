@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import { env } from "./config/env.js";
 import { prisma } from "./lib/prisma.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/auth", authRouter);
 
 app.get("/health", async (_request, response) => {
   try {
