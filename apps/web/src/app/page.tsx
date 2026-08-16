@@ -1,5 +1,6 @@
 import { getPublishedEvents, type PublicEvent } from "@/lib/api";
-
+import { Header } from "@/components/header";
+import Link from "next/link";
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "full",
@@ -26,15 +27,7 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen bg-[#101114] text-zinc-100">
-      <header className="border-b border-white/10">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-          <p className="text-lg font-black tracking-tight">
-            CINE<span className="text-amber-400">PASS</span>
-          </p>
-
-          <p className="text-sm text-zinc-400">Eventos e ingressos</p>
-        </div>
-      </header>
+      <Header />
 
       <section className="mx-auto max-w-6xl px-6 pb-16 pt-20">
         <p className="mb-4 text-sm font-semibold tracking-[0.2em] text-amber-400">
@@ -78,9 +71,10 @@ export default async function Home() {
         ) : (
           <div className="grid gap-5 md:grid-cols-2">
             {events.map((event) => (
-              <article
+              <Link
                 key={event.id}
-                className="rounded-2xl border border-white/10 bg-zinc-900 p-6 transition hover:-translate-y-1 hover:border-amber-400/50"
+                href={`/events/${event.id}`}
+                className="block rounded-2xl border border-white/10 bg-zinc-900 p-6 transition hover:-translate-y-1 hover:border-amber-400/50"
               >
                 <div className="flex items-start justify-between gap-6">
                   <div>
@@ -109,7 +103,7 @@ export default async function Home() {
                     {event.seatCount} assentos
                   </span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
