@@ -91,6 +91,12 @@ export default function LoginPage() {
             {isLoading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+        <p className="mt-6 text-center text-sm text-zinc-400">
+          Ainda não possui uma conta?{" "}
+          <Link href="/register" className="font-bold text-amber-300">
+            Criar conta
+          </Link>
+        </p>
       </section>
     </main>
   );

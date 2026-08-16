@@ -378,3 +378,28 @@ export async function validateTicket(
 
   return data as TicketValidation;
 }
+
+export async function register(
+  name: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  const response = await fetch(`${apiUrl}/auth/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, email, password }),
+  });
+
+  const data = (await response.json()) as
+    | { user: AuthUser }
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível criar a conta.";
+
+    throw new Error(message);
+  }
+}
