@@ -98,3 +98,48 @@ export async function login(
 
   return data as LoginResponse;
 }
+
+export type Reservation = {
+  id: string;
+  status: "PENDING_PAYMENT";
+  expiresAt: string;
+  event: {
+    title: string;
+    price: number;
+  };
+  seat: {
+    label: string;
+  };
+};
+
+export async function createReservation(
+  accessToken: string,
+  eventId: string,
+  seatId: string,
+): Promise<Reservation> {
+  const response = await fetch(`${apiUrl}/reservations`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ eventId, seatId }),
+  });
+
+  const data = (await response.json()) as
+    | { reservation: Reservation }
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível reservar o assento.";
+
+    throw new Error(message);
+  }
+
+  if (!("reservation" in data)) {
+    throw new Error("A API não retornou os dados da reserva.");
+  }
+
+  return data.reservation;
+}
