@@ -262,3 +262,82 @@ export async function getSharedTicket(
 
   return data.ticket;
 }
+
+export type CatalogMovie = {
+  id: number;
+  title: string;
+  overview: string | null;
+  releaseDate: string | null;
+  posterUrl: string | null;
+};
+
+export async function searchMovies(
+  accessToken: string,
+  query: string,
+): Promise<CatalogMovie[]> {
+  const response = await fetch(
+    `${apiUrl}/catalog/movies?query=${encodeURIComponent(query)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  const data = (await response.json()) as
+    | { movies: CatalogMovie[] }
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível buscar os filmes.";
+
+    throw new Error(message);
+  }
+
+  if (!("movies" in data)) {
+    throw new Error("A API não retornou os filmes.");
+  }
+
+  return data.movies;
+}
+
+export type CreateEventInput = {
+  tmdbMovieId?: number;
+  title: string;
+  overview?: string;
+  posterUrl?: string;
+  startsAt: string;
+  venueName: string;
+  venueAddress?: string;
+  price: number;
+  seatLayout: {
+    rows: number;
+    seatsPerRow: number;
+  };
+};
+
+export async function createEvent(
+  accessToken: string,
+  input: CreateEventInput,
+): Promise<void> {
+  const response = await fetch(`${apiUrl}/events`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(input),
+  });
+
+  const data = (await response.json()) as
+    | { event: { id: string } }
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível criar o evento.";
+
+    throw new Error(message);
+  }
+}

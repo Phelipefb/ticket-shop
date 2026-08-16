@@ -55,6 +55,15 @@ export function Header() {
                 Meus ingressos
               </Link>
             ) : null}
+
+            {user.role === "ORGANIZER" ? (
+              <Link
+                href="/organizer/events/new"
+                className="hidden text-sm font-medium text-zinc-300 transition hover:text-amber-300 sm:block"
+              >
+                Criar evento
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={handleLogout}
