@@ -17,6 +17,7 @@ export function Header() {
     }
 
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setUser(JSON.parse(savedUser) as AuthUser);
     } catch {
       localStorage.removeItem("cinepass:user");

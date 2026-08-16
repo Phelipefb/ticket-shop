@@ -43,6 +43,7 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [copiedTicketId, setCopiedTicketId] = useState("");
 
   useEffect(() => {
     const accessToken = localStorage.getItem("cinepass:accessToken");
@@ -68,6 +69,17 @@ export default function TicketsPage() {
         setIsLoading(false);
       });
   }, []);
+
+  async function handleShare(ticket: Ticket) {
+    const shareUrl = `${window.location.origin}/tickets/share/${ticket.shareToken}`;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedTicketId(ticket.id);
+    } catch {
+      window.prompt("Copie o link do ingresso:", shareUrl);
+    }
+  }
 
   return (
     <main className="min-h-screen bg-[#101114] text-zinc-100">
@@ -190,11 +202,23 @@ export default function TicketsPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-dashed border-white/15 px-6 py-4">
-                  <p className="text-xs text-zinc-500">CÓDIGO DO INGRESSO</p>
-                  <p className="mt-1 break-all font-mono text-xs text-zinc-300">
-                    {ticket.code}
-                  </p>
+                <div className="flex items-end justify-between gap-4 border-t border-dashed border-white/15 px-6 py-4">
+                  <div>
+                    <p className="text-xs text-zinc-500">CÓDIGO DO INGRESSO</p>
+                    <p className="mt-1 break-all font-mono text-xs text-zinc-300">
+                      {ticket.code}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleShare(ticket)}
+                    className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-amber-400 hover:text-amber-300"
+                  >
+                    {copiedTicketId === ticket.id
+                      ? "Link copiado!"
+                      : "Compartilhar"}
+                  </button>
                 </div>
               </article>
             ))}

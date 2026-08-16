@@ -238,3 +238,27 @@ export async function getMyTickets(accessToken: string): Promise<Ticket[]> {
 
   return data.tickets;
 }
+
+export type SharedTicket = Omit<Ticket, "shareToken" | "createdAt">;
+
+export async function getSharedTicket(
+  shareToken: string,
+): Promise<SharedTicket | null> {
+  const response = await fetch(`${apiUrl}/tickets/share/${shareToken}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Não foi possível carregar o ingresso compartilhado.");
+  }
+
+  const data = (await response.json()) as {
+    ticket: SharedTicket;
+  };
+
+  return data.ticket;
+}
