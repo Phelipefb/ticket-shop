@@ -176,6 +176,22 @@ eventsRouter.get("/:eventId", async (request, response) => {
           row: true,
           number: true,
           label: true,
+          ticket: {
+            select: {
+              id: true,
+            },
+          },
+          reservations: {
+            where: {
+              status: "PENDING_PAYMENT",
+              expiresAt: {
+                gt: new Date(),
+              },
+            },
+            select: {
+              id: true,
+            },
+          },
         },
       },
     },
@@ -191,6 +207,14 @@ eventsRouter.get("/:eventId", async (request, response) => {
     event: {
       ...event,
       price: event.price.toNumber(),
+      seats: event.seats.map(({ ticket, reservations, ...seat }) => ({
+        ...seat,
+        availability: ticket
+          ? "SOLD"
+          : reservations.length > 0
+            ? "RESERVED"
+            : "AVAILABLE",
+      })),
     },
   });
 });

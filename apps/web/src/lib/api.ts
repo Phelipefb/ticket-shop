@@ -34,6 +34,7 @@ export type EventSeat = {
   row: string;
   number: number;
   label: string;
+  availability: "AVAILABLE" | "RESERVED" | "SOLD";
 };
 
 export type EventDetails = Omit<PublicEvent, "seatCount"> & {

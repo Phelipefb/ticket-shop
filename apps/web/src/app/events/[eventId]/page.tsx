@@ -16,6 +16,28 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
+function getSeatClassName(availability: EventSeat["availability"]) {
+  const commonClassName =
+    "flex aspect-square items-center justify-center rounded-md text-xs font-semibold";
+
+  if (availability === "SOLD") {
+    return `${commonClassName} bg-zinc-800 text-zinc-600`;
+  }
+
+  if (availability === "RESERVED") {
+    return `${commonClassName} bg-amber-400/15 text-amber-300`;
+  }
+
+  return `${commonClassName} bg-emerald-400/15 text-emerald-300`;
+}
+
+function getAvailabilityLabel(availability: EventSeat["availability"]) {
+  if (availability === "SOLD") return "Vendido";
+  if (availability === "RESERVED") return "Em reserva";
+
+  return "Disponível";
+}
+
 export default async function EventDetailsPage({
   params,
 }: {
@@ -107,9 +129,22 @@ export default async function EventDetailsPage({
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold">Mapa de assentos</h2>
-                <p className="mt-1 text-sm text-zinc-400">
-                  Escolha será habilitada no checkout.
-                </p>
+                <div className="mt-3 flex flex-wrap gap-3 text-xs">
+                  <span className="flex items-center gap-1.5 text-emerald-300">
+                    <i className="size-2 rounded-sm bg-emerald-400" />
+                    Disponível
+                  </span>
+
+                  <span className="flex items-center gap-1.5 text-amber-300">
+                    <i className="size-2 rounded-sm bg-amber-400" />
+                    Em reserva
+                  </span>
+
+                  <span className="flex items-center gap-1.5 text-zinc-500">
+                    <i className="size-2 rounded-sm bg-zinc-700" />
+                    Vendido
+                  </span>
+                </div>
               </div>
 
               <span className="rounded-full bg-white/5 px-3 py-1 text-sm text-zinc-300">
@@ -133,7 +168,8 @@ export default async function EventDetailsPage({
                       {seats.map((seat) => (
                         <span
                           key={seat.id}
-                          className="flex aspect-square items-center justify-center rounded-md bg-emerald-400/15 text-xs font-semibold text-emerald-300"
+                          title={`${seat.label}: ${getAvailabilityLabel(seat.availability)}`}
+                          className={getSeatClassName(seat.availability)}
                         >
                           {seat.number}
                         </span>
