@@ -62,3 +62,39 @@ export async function getEventDetails(
 
   return data.event;
 }
+
+export type AuthUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: "ORGANIZER" | "CUSTOMER" | "GATEKEEPER";
+};
+
+type LoginResponse = {
+  accessToken: string;
+  user: AuthUser;
+};
+
+export async function login(
+  email: string,
+  password: string,
+): Promise<LoginResponse> {
+  const response = await fetch(`${apiUrl}/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email, password }),
+  });
+
+  const data = (await response.json()) as LoginResponse | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível fazer login.";
+
+    throw new Error(message);
+  }
+
+  return data as LoginResponse;
+}
