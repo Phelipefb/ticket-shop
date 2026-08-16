@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createReservation, type EventSeat, type Reservation } from "@/lib/api";
 
 type SeatSelectorProps = {
@@ -53,6 +54,7 @@ export function SeatSelector({
   price,
   initialSeats,
 }: SeatSelectorProps) {
+  const router = useRouter();
   const [seats, setSeats] = useState(initialSeats);
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
   const [reservation, setReservation] = useState<Reservation | null>(null);
@@ -91,6 +93,12 @@ export function SeatSelector({
       );
 
       setReservation(createdReservation);
+      sessionStorage.setItem(
+        "cinepass:reservation",
+        JSON.stringify(createdReservation),
+      );
+
+      router.push(`/checkout/${createdReservation.id}`);
       setSeats((currentSeats) =>
         currentSeats.map((seat) =>
           seat.id === selectedSeat.id

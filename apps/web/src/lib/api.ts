@@ -143,3 +143,51 @@ export async function createReservation(
 
   return data.reservation;
 }
+
+export type PaymentResult = {
+  payment: {
+    id: string;
+    status: "APPROVED" | "DECLINED";
+  };
+  reservation: {
+    id: string;
+    status: "CONFIRMED" | "PAYMENT_DECLINED";
+  };
+  ticket?: {
+    id: string;
+    code: string;
+    qrPayload: string;
+    shareToken: string;
+    eventTitle: string;
+    seatLabel: string;
+    price: number;
+  };
+};
+
+export async function processPayment(
+  accessToken: string,
+  reservationId: string,
+  cardNumber: string,
+): Promise<PaymentResult> {
+  const response = await fetch(`${apiUrl}/payments`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ reservationId, cardNumber }),
+  });
+
+  const data = (await response.json()) as PaymentResult | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data
+        ? data.message
+        : "Não foi possível processar o pagamento.";
+
+    throw new Error(message);
+  }
+
+  return data as PaymentResult;
+}
