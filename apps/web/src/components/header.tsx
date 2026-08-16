@@ -46,6 +46,14 @@ export function Header() {
               Olá, {user.name}
             </span>
 
+            {user.role === "CUSTOMER" ? (
+              <Link
+                href="/tickets"
+                className="hidden text-sm font-medium text-zinc-300 transition hover:text-amber-300 sm:block"
+              >
+                Meus ingressos
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={handleLogout}

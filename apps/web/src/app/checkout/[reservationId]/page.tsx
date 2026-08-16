@@ -37,6 +37,7 @@ export default function CheckoutPage() {
       const parsedReservation = JSON.parse(savedReservation) as Reservation;
 
       if (parsedReservation.id === reservationId) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setReservation(parsedReservation);
       }
     } catch {

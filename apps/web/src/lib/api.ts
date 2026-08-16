@@ -191,3 +191,50 @@ export async function processPayment(
 
   return data as PaymentResult;
 }
+
+export type Ticket = {
+  id: string;
+  code: string;
+  qrPayload: string;
+  shareToken: string;
+  status: "ACTIVE" | "USED" | "VOID";
+  usedAt: string | null;
+  createdAt: string;
+  event: {
+    title: string;
+    startsAt: string;
+    venueName: string;
+    venueAddress: string | null;
+    price: number;
+  };
+  seat: {
+    label: string;
+  };
+};
+
+export async function getMyTickets(accessToken: string): Promise<Ticket[]> {
+  const response = await fetch(`${apiUrl}/tickets/me`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  const data = (await response.json()) as
+    | { tickets: Ticket[] }
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data
+        ? data.message
+        : "Não foi possível carregar os ingressos.";
+
+    throw new Error(message);
+  }
+
+  if (!("tickets" in data)) {
+    throw new Error("A API não retornou os ingressos.");
+  }
+
+  return data.tickets;
+}
