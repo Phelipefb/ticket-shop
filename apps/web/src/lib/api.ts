@@ -28,3 +28,36 @@ export async function getPublishedEvents(): Promise<PublicEvent[]> {
 
   return data.events;
 }
+
+export type EventSeat = {
+  id: string;
+  row: string;
+  number: number;
+  label: string;
+};
+
+export type EventDetails = Omit<PublicEvent, "seatCount"> & {
+  seats: EventSeat[];
+};
+
+export async function getEventDetails(
+  eventId: string,
+): Promise<EventDetails | null> {
+  const response = await fetch(`${apiUrl}/events/${eventId}`, {
+    cache: "no-store",
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    throw new Error("Não foi possível carregar a sessão.");
+  }
+
+  const data = (await response.json()) as {
+    event: EventDetails;
+  };
+
+  return data.event;
+}
