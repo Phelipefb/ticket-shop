@@ -64,6 +64,15 @@ export function Header() {
                 Criar evento
               </Link>
             ) : null}
+
+            {user.role === "GATEKEEPER" ? (
+              <Link
+                href="/gate"
+                className="hidden text-sm font-medium text-zinc-300 transition hover:text-amber-300 sm:block"
+              >
+                Portaria
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={handleLogout}

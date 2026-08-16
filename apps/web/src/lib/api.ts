@@ -341,3 +341,40 @@ export async function createEvent(
     throw new Error(message);
   }
 }
+
+export type TicketValidation = {
+  result: "VALID" | "INVALID" | "EVENT_WRONG" | "ALREADY_USED";
+  message: string;
+  ticket?: {
+    eventTitle: string;
+    seatLabel: string;
+  };
+};
+
+export async function validateTicket(
+  accessToken: string,
+  eventId: string,
+  code: string,
+): Promise<TicketValidation> {
+  const response = await fetch(`${apiUrl}/gate/tickets/validate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ eventId, code }),
+  });
+
+  const data = (await response.json()) as
+    | TicketValidation
+    | { message: string };
+
+  if (!response.ok) {
+    const message =
+      "message" in data ? data.message : "Não foi possível validar o ingresso.";
+
+    throw new Error(message);
+  }
+
+  return data as TicketValidation;
+}
