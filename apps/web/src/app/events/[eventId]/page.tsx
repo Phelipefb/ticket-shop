@@ -145,19 +145,24 @@ export default async function EventDetailsPage({
               </span>
             </div>
 
-            <div className="mx-auto mt-10 max-w-md">
+            <div className="mx-auto mt-10 max-w-md overflow-x-auto pb-2">
               <div className="rounded-t-full bg-zinc-700 py-2 text-center text-xs font-bold tracking-[0.3em] text-zinc-300">
                 TELA
               </div>
 
-              <div className="mt-8 space-y-3">
+              <div className="mt-8 min-w-max space-y-3">
                 {Object.entries(seatsByRow).map(([row, seats]) => (
                   <div key={row} className="flex items-center gap-3">
                     <span className="w-4 text-xs font-bold text-zinc-500">
                       {row}
                     </span>
 
-                    <div className="grid flex-1 grid-cols-8 gap-2">
+                    <div
+                      className="grid gap-2"
+                      style={{
+                        gridTemplateColumns: `repeat(${seats.length}, minmax(2rem, 1fr))`,
+                      }}
+                    >
                       {seats.map((seat) => (
                         <span
                           key={seat.id}
