@@ -207,6 +207,18 @@ Resultados possíveis:
 - Um ingresso só pode ser validado uma vez.
 - Apenas portaria valida ingressos.
 
+## Testes automatizados
+
+Os testes da API usam um banco separado chamado `ticket_shop_test`; eles não devem usar o banco de desenvolvimento.
+
+Após criar e migrar esse banco, conforme a configuração local de testes, execute:
+
+```bash
+npm run test -w api
+```
+
+Os testes cobrem a rota de saúde, a prevenção de reserva duplicada, os dois resultados de pagamento e a validação única de ingresso na portaria.
+
 ## Build de produção
 
 ```bash
