@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { register } from "@/lib/api";
+import { BackButton } from "@/components/back-button";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -42,12 +43,16 @@ export default function RegisterPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#101114] px-6 py-12 text-zinc-100">
       <section className="w-full max-w-md rounded-3xl border border-white/10 bg-zinc-900 p-7 sm:p-9">
-        <Link
-          href="/"
-          className="text-lg font-black tracking-tight text-zinc-100"
-        >
-          CINE<span className="text-amber-400">PASS</span>
-        </Link>
+        <div className="flex items-center justify-between">
+          <BackButton />
+
+          <Link
+            href="/"
+            className="text-lg font-black tracking-tight text-zinc-100"
+          >
+            CINE<span className="text-amber-400">PASS</span>
+          </Link>
+        </div>
 
         <h1 className="mt-10 text-3xl font-bold">Criar conta</h1>
         <p className="mt-2 text-sm leading-6 text-zinc-400">

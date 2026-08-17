@@ -8,6 +8,7 @@ import {
   type PaymentResult,
   type Reservation,
 } from "@/lib/api";
+import { BackButton } from "@/components/back-button";
 
 function formatPrice(price: number) {
   return new Intl.NumberFormat("pt-BR", {
@@ -165,12 +166,16 @@ export default function CheckoutPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#101114] px-6 py-12 text-zinc-100">
       <section className="w-full max-w-lg rounded-3xl border border-white/10 bg-zinc-900 p-7 sm:p-9">
-        <Link
-          href="/"
-          className="text-lg font-black tracking-tight text-zinc-100"
-        >
-          CINE<span className="text-amber-400">PASS</span>
-        </Link>
+        <div className="flex items-center justify-between">
+          <Link
+            href="/"
+            className="text-lg font-black tracking-tight text-zinc-100"
+          >
+            CINE<span className="text-amber-400">PASS</span>
+          </Link>
+
+          <BackButton iconOnly />
+        </div>
 
         <p className="mt-10 text-sm font-bold tracking-[0.18em] text-amber-400">
           PAGAMENTO SIMULADO

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSharedTicket } from "@/lib/api";
+import { BackButton } from "@/components/back-button";
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -32,9 +33,13 @@ export default async function SharedTicketPage({
     <main className="flex min-h-screen items-center justify-center bg-[#101114] px-6 py-12 text-zinc-100">
       <section className="w-full max-w-lg overflow-hidden rounded-3xl border border-white/10 bg-zinc-900">
         <div className="border-b border-white/10 p-7">
-          <Link href="/" className="text-lg font-black tracking-tight">
-            CINE<span className="text-amber-400">PASS</span>
-          </Link>
+          <div className="flex items-center justify-between">
+            <BackButton />
+
+            <Link href="/" className="text-lg font-black tracking-tight">
+              CINE<span className="text-amber-400">PASS</span>
+            </Link>
+          </div>
 
           <p className="mt-8 text-xs font-bold tracking-[0.18em] text-amber-400">
             INGRESSO COMPARTILHADO
