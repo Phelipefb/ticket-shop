@@ -31,7 +31,7 @@ export function BackButton({
       className={
         iconOnly
           ? "flex size-10 items-center justify-center rounded-full border border-white/10 text-2xl leading-none text-zinc-300 transition hover:border-amber-400 hover:text-amber-300"
-          : "rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-amber-400 hover:text-amber-300"
+          : "text-sm font-medium text-amber-400 transition hover:text-amber-300"
       }
     >
       {iconOnly ? "×" : "← Voltar"}
