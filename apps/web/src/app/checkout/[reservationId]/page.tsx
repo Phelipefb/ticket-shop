@@ -138,15 +138,25 @@ export default function CheckoutPage() {
           </dl>
 
           <p className="mt-5 text-sm text-zinc-400">
-            Na próxima etapa criaremos a área “Meus ingressos” e o QR Code.
+            Seu QR Code e os dados completos do ingresso já estão disponíveis na
+            sua conta.
           </p>
 
-          <Link
-            href="/"
-            className="mt-8 inline-flex rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950"
-          >
-            Voltar para programação
-          </Link>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/tickets"
+              className="inline-flex rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950"
+            >
+              Ver meus ingressos
+            </Link>
+
+            <Link
+              href="/"
+              className="inline-flex rounded-xl border border-white/10 px-4 py-3 font-bold text-zinc-200 transition hover:border-amber-400 hover:text-amber-300"
+            >
+              Voltar para programação
+            </Link>
+          </div>
         </section>
       </main>
     );
