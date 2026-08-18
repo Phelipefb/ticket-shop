@@ -7,6 +7,7 @@ import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getMyTickets, type Ticket } from "@/lib/api";
 
 function formatDate(date: string) {
@@ -102,7 +103,33 @@ export default function TicketsPage() {
         </p>
 
         {isLoading ? (
-          <p className="mt-10 text-zinc-400">Carregando ingressos...</p>
+          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            {Array.from({ length: 2 }).map((_, index) => (
+              <div
+                key={index}
+                className="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900"
+              >
+                <div className="flex items-start justify-between border-b border-white/10 p-6">
+                  <div className="space-y-3">
+                    <Skeleton className="h-3 w-20 bg-zinc-800" />
+                    <Skeleton className="h-6 w-48 bg-zinc-800" />
+                  </div>
+
+                  <Skeleton className="h-6 w-16 rounded-full bg-zinc-800" />
+                </div>
+
+                <div className="grid gap-6 p-6 sm:grid-cols-[1fr_auto]">
+                  <div className="space-y-4">
+                    <Skeleton className="h-4 w-40 bg-zinc-800" />
+                    <Skeleton className="h-4 w-52 bg-zinc-800" />
+                    <Skeleton className="h-4 w-32 bg-zinc-800" />
+                  </div>
+
+                  <Skeleton className="size-36 rounded-2xl bg-zinc-800" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : error ? (
           <div className="mt-10 rounded-2xl border border-red-400/30 bg-red-400/10 p-6 text-red-200">
             <p>{error}</p>
