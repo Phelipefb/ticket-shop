@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useState } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   processPayment,
   type PaymentResult,
@@ -30,6 +32,7 @@ function formatPrice(price: number) {
   }).format(price);
 }
 
+gsap.registerPlugin(useGSAP);
 export default function CheckoutPage() {
   const params = useParams<{ reservationId: string }>();
   const reservationId = params.reservationId;
@@ -40,6 +43,35 @@ export default function CheckoutPage() {
   const [result, setResult] = useState<PaymentResult | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const successCardRef = useRef<HTMLElement>(null);
+
+  useGSAP(
+    () => {
+      if (!result?.ticket) {
+        return;
+      }
+
+      const media = gsap.matchMedia();
+
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.from("[data-success-item]", {
+          opacity: 0,
+          y: 24,
+          duration: 0.55,
+          stagger: 0.1,
+          ease: "power3.out",
+          clearProps: "transform,opacity",
+        });
+      });
+
+      return () => media.revert();
+    },
+    {
+      scope: successCardRef,
+      dependencies: [result?.ticket?.id],
+      revertOnUpdate: true,
+    },
+  );
 
   useEffect(() => {
     const savedReservation = sessionStorage.getItem("cinepass:reservation");
@@ -135,14 +167,25 @@ export default function CheckoutPage() {
   if (result?.ticket) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#101114] px-6 text-zinc-100">
-        <section className="w-full max-w-lg rounded-3xl border border-emerald-400/30 bg-zinc-900 p-8">
-          <p className="text-sm font-bold tracking-[0.18em] text-emerald-300">
+        <section
+          ref={successCardRef}
+          className="w-full max-w-lg rounded-3xl border border-emerald-400/30 bg-zinc-900 p-8"
+        >
+          <p
+            data-success-item
+            className="text-sm font-bold tracking-[0.18em] text-emerald-300"
+          >
             PAGAMENTO APROVADO
           </p>
 
-          <h1 className="mt-4 text-3xl font-bold">Ingresso gerado!</h1>
+          <h1 data-success-item className="mt-4 text-3xl font-bold">
+            Ingresso gerado!
+          </h1>
 
-          <dl className="mt-8 space-y-4 border-y border-white/10 py-6">
+          <dl
+            data-success-item
+            className="mt-8 space-y-4 border-y border-white/10 py-6"
+          >
             <div>
               <dt className="text-xs font-semibold text-zinc-500">EVENTO</dt>
               <dd className="mt-1 font-medium">{result.ticket.eventTitle}</dd>
@@ -163,12 +206,12 @@ export default function CheckoutPage() {
             </div>
           </dl>
 
-          <p className="mt-5 text-sm text-zinc-400">
+          <p data-success-item className="mt-5 text-sm text-zinc-400">
             Seu QR Code e os dados completos do ingresso já estão disponíveis na
             sua conta.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div data-success-item className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/tickets"
               className="inline-flex rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950"
