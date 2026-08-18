@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
+  cancelReservation,
   processPayment,
   type PaymentResult,
   type Reservation,
@@ -92,7 +93,17 @@ export default function CheckoutPage() {
     }
   }, [reservationId]);
 
-  function handleLeaveCheckout() {
+  async function handleLeaveCheckout() {
+    const accessToken = localStorage.getItem("cinepass:accessToken");
+
+    if (accessToken) {
+      try {
+        await cancelReservation(accessToken, reservationId);
+      } catch {
+        // A reserva pode já estar expirada ou processada; ainda podemos sair.
+      }
+    }
+
     sessionStorage.removeItem("cinepass:reservation");
 
     if (window.history.length > 1) {
@@ -267,7 +278,7 @@ export default function CheckoutPage() {
                 </AlertDialogCancel>
 
                 <AlertDialogAction
-                  onClick={handleLeaveCheckout}
+                  onClick={() => void handleLeaveCheckout()}
                   className="bg-amber-400 text-zinc-950 hover:bg-amber-300"
                 >
                   Sair do checkout

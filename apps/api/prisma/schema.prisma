@@ -38,6 +38,13 @@ enum TicketStatus {
   VOID
 }
 
+enum TicketValidationResult {
+  VALID
+  INVALID
+  EVENT_WRONG
+  ALREADY_USED
+}
+
 model User {
   id               String        @id @default(cuid())
   name             String
@@ -47,6 +54,7 @@ model User {
   organizedEvents  Event[]       @relation("OrganizerEvents")
   reservations     Reservation[] @relation("CustomerReservations")
   validatedTickets Ticket[]      @relation("TicketValidator")
+  ticketValidations TicketValidation[] @relation("GatekeeperValidations")
   createdAt        DateTime      @default(now())
   updatedAt        DateTime      @updatedAt
 }
@@ -68,6 +76,7 @@ model Event {
   organizer   User          @relation("OrganizerEvents", fields: [organizerId], references: [id], onDelete: Restrict)
   seats       Seat[]
   reservations Reservation[]
+  ticketValidations TicketValidation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,8 +150,26 @@ model Ticket {
   reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
   seat        Seat        @relation(fields: [seatId], references: [id], onDelete: Restrict)
   validatedBy User?       @relation("TicketValidator", fields: [validatedById], references: [id], onDelete: Restrict)
+  validations TicketValidation[]
 
   createdAt DateTime @default(now())
 
   @@index([shareToken])
+}
+
+model TicketValidation {
+  id           String                 @id @default(cuid())
+  ticketId     String?
+  eventId      String
+  gatekeeperId String
+  result       TicketValidationResult
+  createdAt    DateTime               @default(now())
+
+  ticket     Ticket? @relation(fields: [ticketId], references: [id], onDelete: SetNull)
+  event      Event   @relation(fields: [eventId], references: [id], onDelete: Restrict)
+  gatekeeper User    @relation("GatekeeperValidations", fields: [gatekeeperId], references: [id], onDelete: Restrict)
+
+  @@index([eventId, createdAt])
+  @@index([gatekeeperId, createdAt])
+  @@index([ticketId])
 }

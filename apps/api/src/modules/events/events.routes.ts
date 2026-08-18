@@ -22,6 +22,10 @@ const createEventSchema = z.object({
   }),
 });
 
+const updateEventSchema = createEventSchema
+  .omit({ seatLayout: true })
+  .partial();
+
 eventsRouter.post(
   "/",
   authenticate,
@@ -104,6 +108,51 @@ eventsRouter.post(
         price: event.price.toNumber(),
         seatCount: seats.length,
       },
+    });
+  },
+);
+
+eventsRouter.patch(
+  "/:eventId",
+  authenticate,
+  authorize("ORGANIZER"),
+  async (request, response) => {
+    const validation = updateEventSchema.safeParse(request.body);
+
+    if (!validation.success) {
+      return response.status(400).json({
+        message: "Dados inválidos.",
+        errors: validation.error.flatten().fieldErrors,
+      });
+    }
+
+    const organizerId = request.auth?.userId;
+
+    if (!organizerId) {
+      return response.status(401).json({ message: "Usuário não autenticado." });
+    }
+
+    const eventId = Array.isArray(request.params.eventId)
+      ? request.params.eventId[0]
+      : request.params.eventId;
+
+    const event = await prisma.event.findFirst({
+      where: { id: eventId, organizerId },
+    });
+
+    if (!event) {
+      return response.status(404).json({
+        message: "Evento não encontrado para este organizador.",
+      });
+    }
+
+    const updatedEvent = await prisma.event.update({
+      where: { id: event.id },
+      data: validation.data,
+    });
+
+    return response.status(200).json({
+      event: { ...updatedEvent, price: updatedEvent.price.toNumber() },
     });
   },
 );

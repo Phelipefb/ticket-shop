@@ -54,6 +54,15 @@ gateRouter.post(
     });
 
     if (!ticket || ticket.status === "VOID") {
+      await prisma.ticketValidation.create({
+        data: {
+          ticketId: ticket?.id,
+          eventId,
+          gatekeeperId,
+          result: "INVALID",
+        },
+      });
+
       return response.status(200).json({
         result: "INVALID",
         message: "Ingresso inválido.",
@@ -61,6 +70,15 @@ gateRouter.post(
     }
 
     if (ticket.reservation.eventId !== eventId) {
+      await prisma.ticketValidation.create({
+        data: {
+          ticketId: ticket.id,
+          eventId,
+          gatekeeperId,
+          result: "EVENT_WRONG",
+        },
+      });
+
       return response.status(200).json({
         result: "EVENT_WRONG",
         message: "Este ingresso pertence a outro evento.",
@@ -68,26 +86,61 @@ gateRouter.post(
     }
 
     if (ticket.status === "USED") {
+      await prisma.ticketValidation.create({
+        data: {
+          ticketId: ticket.id,
+          eventId,
+          gatekeeperId,
+          result: "ALREADY_USED",
+        },
+      });
+
       return response.status(200).json({
         result: "ALREADY_USED",
         message: "Este ingresso já foi utilizado.",
       });
     }
 
-    const updatedTicket = await prisma.ticket.updateMany({
-      where: {
-        id: ticket.id,
-        status: "ACTIVE",
-        usedAt: null,
-      },
-      data: {
-        status: "USED",
-        usedAt: new Date(),
-        validatedById: gatekeeperId,
-      },
+    const wasValidated = await prisma.$transaction(async (transaction) => {
+      const updatedTicket = await transaction.ticket.updateMany({
+        where: {
+          id: ticket.id,
+          status: "ACTIVE",
+          usedAt: null,
+        },
+        data: {
+          status: "USED",
+          usedAt: new Date(),
+          validatedById: gatekeeperId,
+        },
+      });
+
+      if (updatedTicket.count === 0) {
+        return false;
+      }
+
+      await transaction.ticketValidation.create({
+        data: {
+          ticketId: ticket.id,
+          eventId,
+          gatekeeperId,
+          result: "VALID",
+        },
+      });
+
+      return true;
     });
 
-    if (updatedTicket.count === 0) {
+    if (!wasValidated) {
+      await prisma.ticketValidation.create({
+        data: {
+          ticketId: ticket.id,
+          eventId,
+          gatekeeperId,
+          result: "ALREADY_USED",
+        },
+      });
+
       return response.status(200).json({
         result: "ALREADY_USED",
         message: "Este ingresso já foi utilizado.",

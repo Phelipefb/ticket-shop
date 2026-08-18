@@ -7,10 +7,12 @@ import { prisma } from "../src/lib/prisma.js";
 
 describe("POST /gate/tickets/validate", () => {
   let gatekeeperId: string;
+  let organizerId: string;
   let eventId: string;
   let ticketCode: string;
 
   beforeEach(async () => {
+    await prisma.ticketValidation.deleteMany();
     await prisma.ticket.deleteMany();
     await prisma.payment.deleteMany();
     await prisma.reservation.deleteMany();
@@ -88,6 +90,7 @@ describe("POST /gate/tickets/validate", () => {
       },
     });
 
+    organizerId = organizer.id;
     gatekeeperId = gatekeeper.id;
     eventId = event.id;
   });
@@ -128,9 +131,19 @@ describe("POST /gate/tickets/validate", () => {
 
     expect(ticket.status).toBe("USED");
     expect(ticket.validatedById).toBe(gatekeeperId);
+
+    const validations = await prisma.ticketValidation.findMany({
+      where: { ticketId: ticket.id },
+      orderBy: { createdAt: "asc" },
+    });
+
+    expect(validations.map((validation) => validation.result)).toEqual([
+      "VALID",
+      "ALREADY_USED",
+    ]);
   });
 
-  it("informa quando o código do ingresso não existe", async () => {
+  it("informa quando o código do ingresso não existe e registra a tentativa", async () => {
     const response = await request(app)
       .post("/gate/tickets/validate")
       .set("Authorization", `Bearer ${createGatekeeperToken()}`)
@@ -141,5 +154,43 @@ describe("POST /gate/tickets/validate", () => {
 
     expect(response.status).toBe(200);
     expect(response.body.result).toBe("INVALID");
+
+    const validation = await prisma.ticketValidation.findFirstOrThrow({
+      where: { eventId, result: "INVALID" },
+    });
+
+    expect(validation.ticketId).toBeNull();
+    expect(validation.gatekeeperId).toBe(gatekeeperId);
+  });
+
+  it("informa quando o ingresso pertence a outro evento", async () => {
+    const otherEvent = await prisma.event.create({
+      data: {
+        title: "Outra sessão",
+        startsAt: new Date(Date.now() + 48 * 60 * 60 * 1000),
+        venueName: "Outra sala",
+        price: 30,
+        capacity: 1,
+        status: "PUBLISHED",
+        organizerId,
+      },
+    });
+
+    const response = await request(app)
+      .post("/gate/tickets/validate")
+      .set("Authorization", `Bearer ${createGatekeeperToken()}`)
+      .send({
+        eventId: otherEvent.id,
+        code: ticketCode,
+      });
+
+    expect(response.status).toBe(200);
+    expect(response.body.result).toBe("EVENT_WRONG");
+
+    const validation = await prisma.ticketValidation.findFirstOrThrow({
+      where: { eventId: otherEvent.id, result: "EVENT_WRONG" },
+    });
+
+    expect(validation.gatekeeperId).toBe(gatekeeperId);
   });
 });

@@ -240,3 +240,29 @@ Esta aplicação usa a API do TMDb para pesquisa de filmes.
 > This product uses the TMDB API but is not endorsed or certified by TMDB.
 
 https://www.themoviedb.org/
+
+---
+
+## Demonstração online
+
+- Frontend: https://ticket-shop-web.vercel.app/
+- API: https://ticket-shop-api.onrender.com/health
+
+## Verificação de qualidade
+
+Execute os testes da API com:
+
+```bash
+npm run test -w api
+```
+
+Para executar o fluxo E2E no navegador, primeiro encerre qualquer processo de
+`next dev` aberto na pasta `apps/web`. Em seguida, execute:
+
+```bash
+npm run test:e2e
+```
+
+O teste prepara o banco `ticket_shop_test` com migrations e dados de demonstração,
+depois valida o fluxo: login do cliente, escolha de assento, reserva, pagamento
+aprovado e exibição do ingresso.

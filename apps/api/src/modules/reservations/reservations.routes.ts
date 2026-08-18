@@ -177,3 +177,43 @@ reservationsRouter.post(
     }
   },
 );
+
+reservationsRouter.delete(
+  "/:reservationId",
+  authenticate,
+  authorize("CUSTOMER"),
+  async (request, response) => {
+    const customerId = request.auth?.userId;
+
+    if (!customerId) {
+      return response.status(401).json({ message: "Usuário não autenticado." });
+    }
+
+    const reservationId = Array.isArray(request.params.reservationId)
+      ? request.params.reservationId[0]
+      : request.params.reservationId;
+
+    const reservation = await prisma.reservation.findFirst({
+      where: { id: reservationId, customerId },
+    });
+
+    if (!reservation) {
+      return response.status(404).json({ message: "Reserva não encontrada." });
+    }
+
+    if (reservation.status !== "PENDING_PAYMENT") {
+      return response.status(409).json({ message: "Esta reserva não pode ser cancelada." });
+    }
+
+    const status = reservation.expiresAt <= new Date() ? "EXPIRED" : "CANCELLED";
+
+    const updatedReservation = await prisma.reservation.update({
+      where: { id: reservation.id },
+      data: { status },
+    });
+
+    return response.status(200).json({
+      reservation: { id: updatedReservation.id, status: updatedReservation.status },
+    });
+  },
+);

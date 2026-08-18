@@ -120,6 +120,45 @@ export type Reservation = {
   };
 };
 
+export async function cancelReservation(accessToken: string, reservationId: string) {
+  const response = await fetch(`${apiUrl}/reservations/${reservationId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  if (!response.ok) {
+    const data = (await response.json()) as { message?: string };
+    throw new Error(data.message ?? "Não foi possível cancelar a reserva.");
+  }
+}
+
+export async function updateEvent(
+  accessToken: string,
+  eventId: string,
+  data: Partial<{
+    title: string;
+    overview: string;
+    startsAt: string;
+    venueName: string;
+    venueAddress: string;
+    price: number;
+  }>,
+) {
+  const response = await fetch(`${apiUrl}/events/${eventId}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const result = (await response.json()) as { message?: string };
+    throw new Error(result.message ?? "Não foi possível atualizar o evento.");
+  }
+}
+
 export async function createReservation(
   accessToken: string,
   eventId: string,

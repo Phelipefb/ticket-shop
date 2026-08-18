@@ -13,6 +13,7 @@ describe("POST /reservations", () => {
   let seatId: string;
 
   beforeEach(async () => {
+    await prisma.ticketValidation.deleteMany();
     await prisma.ticket.deleteMany();
     await prisma.payment.deleteMany();
     await prisma.reservation.deleteMany();
