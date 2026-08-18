@@ -4,6 +4,8 @@ import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/header";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getMyTickets, type Ticket } from "@/lib/api";
 
 function formatDate(date: string) {
@@ -127,9 +129,9 @@ export default function TicketsPage() {
         ) : (
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
             {tickets.map((ticket) => (
-              <article
+              <Card
                 key={ticket.id}
-                className="overflow-hidden rounded-3xl border border-white/10 bg-zinc-900"
+                className="gap-0 overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 py-0 ring-0"
               >
                 <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6">
                   <div>
@@ -209,18 +211,18 @@ export default function TicketsPage() {
                       {ticket.code}
                     </p>
                   </div>
-
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={() => handleShare(ticket)}
-                    className="shrink-0 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-zinc-200 transition hover:border-amber-400 hover:text-amber-300"
+                    className="h-auto shrink-0 rounded-lg border-white/10 px-3 py-2 text-zinc-200 hover:border-amber-400 hover:text-amber-300"
                   >
                     {copiedTicketId === ticket.id
                       ? "Link copiado!"
                       : "Compartilhar"}
-                  </button>
+                  </Button>
                 </div>
-              </article>
+              </Card>
             ))}
           </div>
         )}
