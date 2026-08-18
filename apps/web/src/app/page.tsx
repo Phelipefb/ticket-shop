@@ -1,19 +1,6 @@
 import { getPublishedEvents, type PublicEvent } from "@/lib/api";
 import { Header } from "@/components/header";
-import Link from "next/link";
-function formatDate(date: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "full",
-    timeStyle: "short",
-  }).format(new Date(date));
-}
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(price);
-}
+import { EventGrid } from "@/components/event-grid";
 
 export default async function Home() {
   let events: PublicEvent[] = [];
@@ -69,43 +56,7 @@ export default async function Home() {
             Nenhuma sessão publicada no momento.
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2">
-            {events.map((event) => (
-              <Link
-                key={event.id}
-                href={`/events/${event.id}`}
-                className="block rounded-2xl border border-white/10 bg-zinc-900 p-6 transition hover:-translate-y-1 hover:border-amber-400/50"
-              >
-                <div className="flex items-start justify-between gap-6">
-                  <div>
-                    <p className="text-sm font-medium text-amber-400">
-                      {formatDate(event.startsAt)}
-                    </p>
-
-                    <h3 className="mt-3 text-2xl font-bold">{event.title}</h3>
-
-                    <p className="mt-3 line-clamp-2 text-sm leading-6 text-zinc-400">
-                      {event.overview ?? "Sessão especial em cartaz."}
-                    </p>
-                  </div>
-
-                  <span className="shrink-0 text-lg font-bold">
-                    {formatPrice(event.price)}
-                  </span>
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-2 text-sm text-zinc-300">
-                  <span className="rounded-full bg-white/5 px-3 py-1">
-                    {event.venueName}
-                  </span>
-
-                  <span className="rounded-full bg-white/5 px-3 py-1">
-                    {event.seatCount} assentos
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
+          <EventGrid events={events} />
         )}
       </section>
     </main>
