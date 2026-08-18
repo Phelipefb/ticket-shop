@@ -79,13 +79,21 @@ export async function login(
   email: string,
   password: string,
 ): Promise<LoginResponse> {
-  const response = await fetch(`${apiUrl}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${apiUrl}/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch {
+    throw new Error(
+      "Não foi possível conectar ao serviço. Verifique sua conexão e tente novamente.",
+    );
+  }
 
   const data = (await response.json()) as LoginResponse | { message: string };
 
