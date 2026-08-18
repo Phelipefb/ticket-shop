@@ -3,6 +3,17 @@
 import type { Html5QrcodeScanner } from "html5-qrcode";
 import { type FormEvent, useEffect, useState } from "react";
 import { Header } from "@/components/header";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   getPublishedEvents,
   validateTicket,
@@ -156,52 +167,65 @@ export default function GatePage() {
             <h2 className="text-lg font-bold">Validação manual</h2>
 
             <form className="mt-6 space-y-5" onSubmit={handleSubmit}>
-              <label className="block">
-                <span className="text-sm font-medium">Evento</span>
+              <div className="space-y-2">
+                <Label htmlFor="eventId" className="text-zinc-200">
+                  Evento
+                </Label>
 
-                <select
+                <Select
                   value={eventId}
-                  onChange={(event) => setEventId(event.target.value)}
-                  required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none focus:border-amber-400"
+                  onValueChange={setEventId}
+                  disabled={events.length === 0}
                 >
-                  {events.length === 0 ? (
-                    <option value="">Carregando eventos...</option>
-                  ) : (
-                    events.map((event) => (
-                      <option key={event.id} value={event.id}>
+                  <SelectTrigger
+                    id="eventId"
+                    className="h-12 w-full rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
+                  >
+                    <SelectValue placeholder="Carregando eventos..." />
+                  </SelectTrigger>
+
+                  <SelectContent className="bg-zinc-900 text-zinc-100">
+                    {events.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
                         {event.title}
-                      </option>
-                    ))
-                  )}
-                </select>
-              </label>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-              <label className="block">
-                <span className="text-sm font-medium">Código do ingresso</span>
+              <div className="space-y-2">
+                <Label htmlFor="ticketCode" className="text-zinc-200">
+                  Código do ingresso
+                </Label>
 
-                <input
+                <Input
+                  id="ticketCode"
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
                   placeholder="TKT-..."
                   required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 font-mono text-sm outline-none focus:border-amber-400"
+                  className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 font-mono text-sm text-zinc-100 focus-visible:border-amber-400"
                 />
-              </label>
+              </div>
 
               {error ? (
-                <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-                  {error}
-                </p>
+                <Alert
+                  variant="destructive"
+                  className="border-red-400/30 bg-red-400/10 text-red-200"
+                >
+                  <AlertDescription className="text-red-200">
+                    {error}
+                  </AlertDescription>
+                </Alert>
               ) : null}
-
-              <button
+              <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-12 w-full rounded-xl font-bold"
               >
                 {isLoading ? "Validando..." : "Validar ingresso"}
-              </button>
+              </Button>
             </form>
 
             {result ? (
