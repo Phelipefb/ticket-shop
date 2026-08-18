@@ -174,7 +174,7 @@ export default function GatePage() {
 
                 <Select
                   value={eventId}
-                  onValueChange={setEventId}
+                  onValueChange={(value) => setEventId(value ?? "")}
                   disabled={events.length === 0}
                 >
                   <SelectTrigger
