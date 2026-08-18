@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { createReservation, type EventSeat, type Reservation } from "@/lib/api";
+
+gsap.registerPlugin(useGSAP);
 
 type SeatSelectorProps = {
   eventId: string;
@@ -60,6 +64,41 @@ export function SeatSelector({
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const seatMapRef = useRef<HTMLDivElement>(null);
+
+  const { contextSafe } = useGSAP({ scope: seatMapRef });
+
+  const handleSeatSelection = contextSafe(
+    (seatId: string, button: HTMLButtonElement) => {
+      setError("");
+      setSelectedSeatId(seatId);
+
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        return;
+      }
+
+      gsap.fromTo(
+        button,
+        { scale: 0.7 },
+        {
+          keyframes: [
+            {
+              scale: 1.22,
+              duration: 0.25,
+              ease: "power3.out",
+            },
+            {
+              scale: 1,
+              duration: 0.45,
+              ease: "elastic.out(1, 0.4)",
+            },
+          ],
+          overwrite: "auto",
+        },
+      );
+    },
+  );
 
   const selectedSeat = seats.find((seat) => seat.id === selectedSeatId) ?? null;
 
@@ -148,7 +187,10 @@ export function SeatSelector({
         </span>
       </div>
 
-      <div className="mx-auto mt-10 max-w-md overflow-x-auto pb-2">
+      <div
+        ref={seatMapRef}
+        className="mx-auto mt-10 max-w-md overflow-x-auto pb-2"
+      >
         <div className="rounded-t-full bg-zinc-700 py-2 text-center text-xs font-bold tracking-[0.3em] text-zinc-300">
           TELA
         </div>
@@ -177,9 +219,8 @@ export function SeatSelector({
                       }
                       title={`${seat.label}: ${getAvailabilityLabel(seat.availability)}`}
                       aria-pressed={isSelected}
-                      onClick={() => {
-                        setError("");
-                        setSelectedSeatId(seat.id);
+                      onClick={(event) => {
+                        handleSeatSelection(seat.id, event.currentTarget);
                       }}
                       className={getSeatClassName(seat, isSelected)}
                     >
