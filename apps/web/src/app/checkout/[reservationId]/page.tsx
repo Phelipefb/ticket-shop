@@ -1,14 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
 import {
   processPayment,
   type PaymentResult,
   type Reservation,
 } from "@/lib/api";
-import { BackButton } from "@/components/back-button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +33,7 @@ function formatPrice(price: number) {
 export default function CheckoutPage() {
   const params = useParams<{ reservationId: string }>();
   const reservationId = params.reservationId;
+  const router = useRouter();
 
   const [reservation, setReservation] = useState<Reservation | null>(null);
   const [cardNumber, setCardNumber] = useState("4242 4242 4242 4242");
@@ -48,6 +59,17 @@ export default function CheckoutPage() {
       sessionStorage.removeItem("cinepass:reservation");
     }
   }, [reservationId]);
+
+  function handleLeaveCheckout() {
+    sessionStorage.removeItem("cinepass:reservation");
+
+    if (window.history.length > 1) {
+      router.back();
+      return;
+    }
+
+    router.push("/");
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -177,7 +199,39 @@ export default function CheckoutPage() {
             CINE<span className="text-amber-400">PASS</span>
           </Link>
 
-          <BackButton iconOnly />
+          <AlertDialog>
+            <AlertDialogTrigger
+              type="button"
+              aria-label="Fechar checkout"
+              title="Fechar checkout"
+              className="flex size-10 items-center justify-center rounded-full border border-white/10 text-2xl leading-none text-zinc-300 transition hover:border-amber-400 hover:text-amber-300"
+            >
+              ×
+            </AlertDialogTrigger>
+
+            <AlertDialogContent className="border border-white/10 bg-zinc-900 p-6 text-zinc-100">
+              <AlertDialogHeader>
+                <AlertDialogTitle>Deseja sair do checkout?</AlertDialogTitle>
+                <AlertDialogDescription className="text-zinc-400">
+                  Você voltará para a escolha de lugares e precisará iniciar o
+                  pagamento novamente.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter className="-mx-6 -mb-6 border-white/10 bg-zinc-950/60 p-4">
+                <AlertDialogCancel className="border-white/10 text-zinc-100 hover:border-amber-400">
+                  Continuar no checkout
+                </AlertDialogCancel>
+
+                <AlertDialogAction
+                  onClick={handleLeaveCheckout}
+                  className="bg-amber-400 text-zinc-950 hover:bg-amber-300"
+                >
+                  Sair do checkout
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <p className="mt-10 text-sm font-bold tracking-[0.18em] text-amber-400">
