@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import { Header } from "@/components/header";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { createEvent, searchMovies, type CatalogMovie } from "@/lib/api";
 
 export default function NewEventPage() {
@@ -131,12 +136,13 @@ export default function NewEventPage() {
 
         <section className="mt-10 rounded-3xl border border-white/10 bg-zinc-900 p-6 sm:p-8">
           <div>
-            <label className="text-sm font-medium text-zinc-200">
+            <Label htmlFor="movieSearch" className="text-zinc-200">
               Buscar filme no TMDb
-            </label>
+            </Label>
 
             <div className="mt-2 flex gap-3">
-              <input
+              <Input
+                id="movieSearch"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 onKeyDown={(event) => {
@@ -146,19 +152,19 @@ export default function NewEventPage() {
                   }
                 }}
                 placeholder="Ex.: Matrix"
-                className="min-w-0 flex-1 rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                className="h-12 min-w-0 flex-1 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
               />
 
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => void handleSearch()}
                 disabled={isSearching}
-                className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-amber-400 disabled:opacity-50"
+                className="h-12 shrink-0 rounded-xl border-white/10 px-4 font-bold text-zinc-100 hover:border-amber-400"
               >
                 {isSearching ? "Buscando..." : "Buscar"}
-              </button>
+              </Button>
             </div>
-
             {movies.length > 0 ? (
               <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
                 {movies.map((movie) => (
@@ -185,128 +191,162 @@ export default function NewEventPage() {
               </p>
             ) : null}
           </div>
-
           <form
             className="mt-8 space-y-5 border-t border-white/10 pt-8"
             onSubmit={handleSubmit}
           >
-            <label className="block">
-              <span className="text-sm font-medium">Título da sessão</span>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="eventTitle" className="text-zinc-200">
+                Título da sessão
+              </Label>
+
+              <Input
+                id="eventTitle"
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 required
-                className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
               />
-            </label>
+            </div>
 
-            <label className="block">
-              <span className="text-sm font-medium">Descrição</span>
-              <textarea
+            <div className="space-y-2">
+              <Label htmlFor="eventOverview" className="text-zinc-200">
+                Descrição
+              </Label>
+
+              <Textarea
+                id="eventOverview"
                 value={overview}
                 onChange={(event) => setOverview(event.target.value)}
                 rows={4}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                className="min-h-28 rounded-xl border-white/10 bg-zinc-950 px-4 py-3 text-zinc-100 focus-visible:border-amber-400"
               />
-            </label>
+            </div>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-sm font-medium">Data e horário</span>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="startsAt" className="text-zinc-200">
+                  Data e horário
+                </Label>
+
+                <Input
+                  id="startsAt"
                   type="datetime-local"
                   value={startsAt}
                   onChange={(event) => setStartsAt(event.target.value)}
                   required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                  className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
                 />
-              </label>
+              </div>
 
-              <label className="block">
-                <span className="text-sm font-medium">Preço (R$)</span>
-                <input
+              <div className="space-y-2">
+                <Label htmlFor="price" className="text-zinc-200">
+                  Preço (R$)
+                </Label>
+
+                <Input
+                  id="price"
                   type="number"
                   min="0.01"
                   step="0.01"
                   value={price}
                   onChange={(event) => setPrice(event.target.value)}
                   required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                  className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
                 />
-              </label>
+              </div>
             </div>
 
-            <label className="block">
-              <span className="text-sm font-medium">Nome do local</span>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="venueName" className="text-zinc-200">
+                Nome do local
+              </Label>
+
+              <Input
+                id="venueName"
                 value={venueName}
                 onChange={(event) => setVenueName(event.target.value)}
                 required
                 minLength={2}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
               />
-            </label>
+            </div>
 
-            <label className="block">
-              <span className="text-sm font-medium">Endereço</span>
-              <input
+            <div className="space-y-2">
+              <Label htmlFor="venueAddress" className="text-zinc-200">
+                Endereço
+              </Label>
+
+              <Input
+                id="venueAddress"
                 value={venueAddress}
                 onChange={(event) => setVenueAddress(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
               />
-            </label>
+            </div>
 
             <div className="grid gap-5 sm:grid-cols-2">
-              <label className="block">
-                <span className="text-sm font-medium">
+              <div className="space-y-2">
+                <Label htmlFor="rows" className="text-zinc-200">
                   Quantidade de fileiras
-                </span>
-                <input
+                </Label>
+
+                <Input
+                  id="rows"
                   type="number"
                   min="1"
                   max="26"
                   value={rows}
                   onChange={(event) => setRows(event.target.value)}
                   required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                  className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
                 />
-              </label>
+              </div>
 
-              <label className="block">
-                <span className="text-sm font-medium">
+              <div className="space-y-2">
+                <Label htmlFor="seatsPerRow" className="text-zinc-200">
                   Assentos por fileira
-                </span>
-                <input
+                </Label>
+
+                <Input
+                  id="seatsPerRow"
                   type="number"
                   min="1"
                   max="50"
                   value={seatsPerRow}
                   onChange={(event) => setSeatsPerRow(event.target.value)}
                   required
-                  className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 outline-none transition focus:border-amber-400"
+                  className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
                 />
-              </label>
+              </div>
             </div>
 
             {error ? (
-              <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-                {error}
-              </p>
+              <Alert
+                variant="destructive"
+                className="border-red-400/30 bg-red-400/10 text-red-200"
+              >
+                <AlertDescription className="text-red-200">
+                  {error}
+                </AlertDescription>
+              </Alert>
             ) : null}
 
             {success ? (
-              <p className="rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-                {success}
-              </p>
+              <Alert className="border-emerald-400/30 bg-emerald-400/10 text-emerald-200">
+                <AlertDescription className="text-emerald-200">
+                  {success}
+                </AlertDescription>
+              </Alert>
             ) : null}
 
-            <button
+            <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+              className="h-12 w-full rounded-xl font-bold"
             >
               {isSubmitting ? "Publicando..." : "Publicar evento"}
-            </button>
+            </Button>
           </form>
         </section>
       </section>
