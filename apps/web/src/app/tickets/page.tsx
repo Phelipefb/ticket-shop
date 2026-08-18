@@ -5,6 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/header";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { getMyTickets, type Ticket } from "@/lib/api";
 
@@ -143,11 +144,11 @@ export default function TicketsPage() {
                     </h2>
                   </div>
 
-                  <span
-                    className={`shrink-0 rounded-full px-3 py-1 text-xs font-bold ${getStatusClassName(ticket.status)}`}
+                  <Badge
+                    className={`h-auto shrink-0 rounded-full px-3 py-1 text-xs font-bold ${getStatusClassName(ticket.status)}`}
                   >
                     {getStatusLabel(ticket.status)}
-                  </span>
+                  </Badge>
                 </div>
 
                 <div className="grid gap-6 p-6 sm:grid-cols-[1fr_auto]">
