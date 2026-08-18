@@ -9,7 +9,10 @@ import {
   type Reservation,
 } from "@/lib/api";
 import { BackButton } from "@/components/back-button";
-
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 function formatPrice(price: number) {
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -201,19 +204,20 @@ export default function CheckoutPage() {
         </div>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-zinc-200">
+          <div className="space-y-2">
+            <Label htmlFor="cardNumber" className="text-zinc-200">
               Número do cartão de teste
-            </span>
+            </Label>
 
-            <input
+            <Input
+              id="cardNumber"
               value={cardNumber}
               onChange={(event) => setCardNumber(event.target.value)}
               inputMode="numeric"
               required
-              className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-zinc-100 outline-none transition focus:border-amber-400"
+              className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 focus-visible:border-amber-400"
             />
-          </label>
+          </div>
 
           <div className="rounded-xl border border-white/10 bg-zinc-950/60 p-4 text-xs leading-6 text-zinc-400">
             <p>
@@ -227,18 +231,23 @@ export default function CheckoutPage() {
           </div>
 
           {error ? (
-            <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {error}
-            </p>
+            <Alert
+              variant="destructive"
+              className="border-red-400/30 bg-red-400/10 text-red-200"
+            >
+              <AlertDescription className="text-red-200">
+                {error}
+              </AlertDescription>
+            </Alert>
           ) : null}
 
-          <button
+          <Button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-12 w-full rounded-xl font-bold"
           >
             {isLoading ? "Processando..." : "Pagar e gerar ingresso"}
-          </button>
+          </Button>
         </form>
       </section>
     </main>
