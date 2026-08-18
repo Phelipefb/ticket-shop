@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { login } from "@/lib/api";
 import { BackButton } from "@/components/back-button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -58,43 +62,56 @@ export default function LoginPage() {
         </p>
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-zinc-200">E-mail</span>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-zinc-200">
+              E-mail
+            </Label>
+
+            <Input
+              id="email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
               autoComplete="email"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-amber-400"
+              className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-400"
             />
-          </label>
+          </div>
 
-          <label className="block">
-            <span className="text-sm font-medium text-zinc-200">Senha</span>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-zinc-200">
+              Senha
+            </Label>
+
+            <Input
+              id="password"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
               autoComplete="current-password"
-              className="mt-2 w-full rounded-xl border border-white/10 bg-zinc-950 px-4 py-3 text-zinc-100 outline-none transition placeholder:text-zinc-600 focus:border-amber-400"
+              className="h-12 rounded-xl border-white/10 bg-zinc-950 px-4 text-zinc-100 placeholder:text-zinc-600 focus-visible:border-amber-400"
             />
-          </label>
+          </div>
 
           {error ? (
-            <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-3 text-sm text-red-200">
-              {error}
-            </p>
+            <Alert
+              variant="destructive"
+              className="border-red-400/30 bg-red-400/10 text-red-200"
+            >
+              <AlertDescription className="text-red-200">
+                {error}
+              </AlertDescription>
+            </Alert>
           ) : null}
 
-          <button
+          <Button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-amber-400 px-4 py-3 font-bold text-zinc-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-12 w-full rounded-xl font-bold"
           >
             {isLoading ? "Entrando..." : "Entrar"}
-          </button>
+          </Button>
         </form>
         <p className="mt-6 text-center text-sm text-zinc-400">
           Ainda não possui uma conta?{" "}
