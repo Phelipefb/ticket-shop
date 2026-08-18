@@ -2,13 +2,17 @@
 
 import Link from "next/link";
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/header";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMyTickets, type Ticket } from "@/lib/api";
+
+gsap.registerPlugin(useGSAP);
 
 function formatDate(date: string) {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -48,7 +52,7 @@ export default function TicketsPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [copiedTicketId, setCopiedTicketId] = useState("");
-
+  const ticketsContainer = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const accessToken = localStorage.getItem("cinepass:accessToken");
 
@@ -73,6 +77,39 @@ export default function TicketsPage() {
         setIsLoading(false);
       });
   }, []);
+
+  useGSAP(
+    () => {
+      if (isLoading || tickets.length === 0) {
+        return;
+      }
+
+      const cards = gsap.utils.toArray<HTMLElement>("[data-ticket-card]");
+
+      const media = gsap.matchMedia();
+
+      media.add("(prefers-reduced-motion: no-preference)", () => {
+        gsap.from(cards, {
+          opacity: 0,
+          y: 44,
+          scale: 0.97,
+          duration: 1.1,
+          stagger: 0.22,
+          ease: "power3.out",
+          onComplete: () => {
+            gsap.set(cards, { clearProps: "transform,opacity" });
+          },
+        });
+      });
+
+      return () => media.revert();
+    },
+    {
+      scope: ticketsContainer,
+      dependencies: [isLoading, tickets.length],
+      revertOnUpdate: true,
+    },
+  );
 
   async function handleShare(ticket: Ticket) {
     const shareUrl = `${window.location.origin}/tickets/share/${ticket.shareToken}`;
@@ -155,10 +192,14 @@ export default function TicketsPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <div
+            ref={ticketsContainer}
+            className="mt-10 grid gap-6 lg:grid-cols-2"
+          >
             {tickets.map((ticket) => (
               <Card
                 key={ticket.id}
+                data-ticket-card
                 className="gap-0 overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 py-0 ring-0"
               >
                 <div className="flex items-start justify-between gap-4 border-b border-white/10 p-6">
