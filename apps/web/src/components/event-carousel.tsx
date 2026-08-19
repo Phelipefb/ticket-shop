@@ -48,7 +48,7 @@ export function EventCarousel({ events }: EventCarouselProps) {
   return (
     <section className="mx-auto max-w-6xl px-6 pb-12 pt-10 sm:pt-14">
       <div
-        className="group relative min-h-[430px] overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/25 sm:min-h-[400px]"
+        className="group relative overflow-hidden rounded-3xl border border-white/10 bg-zinc-900 shadow-2xl shadow-black/25"
         aria-roledescription="carrossel"
         aria-label="Eventos em destaque"
         onMouseEnter={() => setIsPaused(true)}
@@ -63,8 +63,10 @@ export function EventCarousel({ events }: EventCarouselProps) {
             <article
               key={event.id}
               aria-hidden={!isActive}
-              className={`absolute inset-0 transition-opacity duration-700 ease-out ${
-                isActive ? "opacity-100" : "pointer-events-none opacity-0"
+              className={`transition-opacity duration-700 ease-out ${
+                isActive
+                  ? "relative min-h-[430px] opacity-100 sm:min-h-[400px]"
+                  : "pointer-events-none absolute inset-0 opacity-0"
               }`}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/95 to-zinc-950/55" />
@@ -79,7 +81,7 @@ export function EventCarousel({ events }: EventCarouselProps) {
                 />
               ) : null}
 
-              <div className="relative flex h-full max-w-2xl flex-col justify-center py-7 pl-20 pr-14 sm:py-12 sm:pl-28 sm:pr-20">
+              <div className="relative flex min-h-[430px] max-w-2xl flex-col justify-center pb-20 pl-20 pr-14 pt-9 sm:min-h-[400px] sm:pb-24 sm:pl-28 sm:pr-20 sm:pt-12">
                 <p className="text-xs font-bold tracking-[0.22em] text-amber-400">
                   EVENTO EM DESTAQUE
                 </p>
