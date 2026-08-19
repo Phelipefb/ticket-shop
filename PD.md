@@ -14,18 +14,18 @@ O fluxo mais importante é: **criar sessão → escolher assento → reservar �
 
 ## 2. Tecnologias escolhidas
 
-| Camada | Tecnologia | Por quê |
-| --- | --- | --- |
-| Front-end | Next.js + TypeScript | React com estrutura pronta para telas, rotas e deploy na Vercel. |
-| Estilos | Tailwind CSS + componentes próprios | Agilidade sem abrir mão de uma identidade visual autoral. |
-| Back-end | Node.js + Express + TypeScript | API REST simples, tipada e adequada ao prazo. |
-| Banco de dados | PostgreSQL | Banco relacional ideal para reservas e prevenção de assentos duplicados. |
-| ORM | Prisma | Facilita modelagem, migrations, seed e acesso tipado ao banco. |
-| Catálogo externo | TMDb | Fornece filmes, sinopses e imagens para o organizador. |
-| Autenticação | JWT + bcrypt | Login por e-mail/senha e controle dos papéis exigidos. |
-| Desenvolvimento local | Docker Compose | Sobe o PostgreSQL com configuração reproduzível. |
-| Deploy | Vercel + Render + Neon | Web na Vercel, API no Render e banco hospedado no Neon. |
-| Testes | Vitest/Supertest e Playwright | Testes das regras críticas e de um fluxo completo de compra. |
+| Camada                | Tecnologia                          | Por quê                                                                  |
+| --------------------- | ----------------------------------- | ------------------------------------------------------------------------ |
+| Front-end             | Next.js + TypeScript                | React com estrutura pronta para telas, rotas e deploy na Vercel.         |
+| Estilos               | Tailwind CSS + componentes próprios | Agilidade sem abrir mão de uma identidade visual autoral.                |
+| Back-end              | Node.js + Express + TypeScript      | API REST simples, tipada e adequada ao prazo.                            |
+| Banco de dados        | PostgreSQL                          | Banco relacional ideal para reservas e prevenção de assentos duplicados. |
+| ORM                   | Prisma                              | Facilita modelagem, migrations, seed e acesso tipado ao banco.           |
+| Catálogo externo      | TMDb                                | Fornece filmes, sinopses e imagens para o organizador.                   |
+| Autenticação          | JWT + bcrypt                        | Login por e-mail/senha e controle dos papéis exigidos.                   |
+| Desenvolvimento local | Docker Compose                      | Sobe o PostgreSQL com configuração reproduzível.                         |
+| Deploy                | Vercel + Render + Neon              | Web na Vercel, API no Render e banco hospedado no Neon.                  |
+| Testes                | Vitest/Supertest e Playwright       | Testes das regras críticas e de um fluxo completo de compra.             |
 
 ## 3. Estrutura do repositório
 
@@ -46,11 +46,11 @@ ticket-shop/
 
 ## 4. Papéis e permissões
 
-| Papel | Pode fazer |
-| --- | --- |
-| `ORGANIZER` | Pesquisar filmes no TMDb; criar, editar e consultar suas sessões. |
-| `CUSTOMER` | Buscar sessões; reservar assentos; pagar; acessar seus ingressos. |
-| `GATEKEEPER` | Validar ingressos para a entrada de uma sessão. |
+| Papel        | Pode fazer                                                        |
+| ------------ | ----------------------------------------------------------------- |
+| `ORGANIZER`  | Pesquisar filmes no TMDb; criar, editar e consultar suas sessões. |
+| `CUSTOMER`   | Buscar sessões; reservar assentos; pagar; acessar seus ingressos. |
+| `GATEKEEPER` | Validar ingressos para a entrada de uma sessão.                   |
 
 O front-end pode ocultar ações inadequadas, mas a API será a autoridade: toda rota protegida verificará o JWT e o papel do usuário.
 
@@ -158,7 +158,7 @@ Depois do fluxo completo, poderemos adicionar filtros, painel do organizador, ca
 
 ## 12. Como vamos trabalhar
 
-Você fará as alterações manualmente. Antes de cada etapa, eu explicarei:
+Você fará as criações e alterações manualmente. Antes de cada etapa, qualquer duvida eu explicarei:
 
 1. o que vamos construir e por quê;
 2. quais comandos executar;

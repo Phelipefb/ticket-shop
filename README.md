@@ -64,7 +64,6 @@ apps/
   web/       # Aplicação Next.js
 docker-compose.yml
 PD.md        # Plano de desenvolvimento
-docs/        # Documentação complementar
 ```
 
 ---
@@ -74,7 +73,8 @@ docs/        # Documentação complementar
 | Área         | Entregas                                                                                         |
 | ------------ | ------------------------------------------------------------------------------------------------ |
 | Autenticação | Cadastro, login, JWT e controle de perfis.                                                       |
-| Eventos      | Busca no TMDb, criação e edição de sessões, com mapa de assentos.                                |
+| Eventos      | Busca no TMDb, criação, edição e cancelamento de sessões, com mapa de assentos.                  |
+| Programação  | Cards e carrossel de destaques com pôster, nota TMDb, detalhes e navegação automática ou manual. |
 | Compra       | Reserva temporária, cancelamento, pagamento aprovado/recusado e proteção contra venda duplicada. |
 | Ingressos    | QR Code, código manual e link público somente leitura.                                           |
 | Portaria     | Validação por câmera ou código, incluindo bloqueio de reutilização.                              |
@@ -188,7 +188,7 @@ Cartões de teste:
 1. Entrar como organizador.
 2. Buscar filme no TMDb.
 3. Preencher sessão, local, preço e mapa de assentos.
-4. Publicar ou editar o evento criado.
+4. Publicar, editar ou cancelar um evento próprio pela área **Meus eventos**.
 
 ### Portaria
 
@@ -202,6 +202,7 @@ Resultados possíveis:
 - `VALID`
 - `INVALID`
 - `EVENT_WRONG`
+- `EVENT_CANCELLED`
 - `ALREADY_USED`
 
 ## Regras de negócio
@@ -216,6 +217,7 @@ Resultados possíveis:
 - Links compartilhados são públicos e somente leitura.
 - Um ingresso só pode ser validado uma vez.
 - Apenas portaria valida ingressos.
+- Apenas eventos publicados, futuros e com pôster aparecem na programação pública.
 
 ## Testes automatizados
 
@@ -245,7 +247,17 @@ npm run build -w web
 
 ## TMDb
 
-Esta aplicação usa a API do TMDb para pesquisa de filmes.
+Esta aplicação usa a API do TMDb para pesquisa de filmes. Ao selecionar um filme,
+a sessão recebe título, sinopse, pôster e nota do catálogo. Os pôsteres e as notas
+são exibidos nos cards e no carrossel da página inicial.
+
+Para complementar dados de eventos antigos já vinculados ao TMDb, execute na raiz:
+
+```bash
+npm run backfill:tmdb -w api
+```
+
+Eventos sem pôster não são exibidos ao público, evitando cards ou destaques sem imagem.
 
 > This product uses the TMDB API but is not endorsed or certified by TMDB.
 
@@ -272,3 +284,9 @@ npm run test:e2e
 O teste prepara o banco `ticket_shop_test` com migrations e dados de demonstração,
 depois valida o fluxo: login do cliente, escolha de assento, reserva, pagamento
 aprovado e exibição do ingresso.
+
+## Uso de IA
+
+Durante a criação do Plano de Desenvolvimento (PD), utilizei a inteligência artificial como apoio e fonte de sugestões. A implementação das etapas do projeto contou com a atuação da IA como uma espécie de “professor”, oferecendo dicas, exemplos de aplicação de código e sugestões práticas em pontos onde encontrei maior dificuldade.
+
+Devido à limitação de tempo e ao meu nível atual de conhecimento, a fase de testes da aplicação foi realizada com auxílio da IA, que contribuiu na correção de erros e na orientação quanto ao uso adequado das ferramentas e recursos necessários. Esse suporte foi fundamental para superar barreiras técnicas e garantir a conclusão do projeto dentro do prazo estabelecido.
