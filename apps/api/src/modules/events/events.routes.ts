@@ -224,6 +224,9 @@ eventsRouter.get("/", async (_request, response) => {
   const events = await prisma.event.findMany({
     where: {
       status: "PUBLISHED",
+      posterUrl: {
+        not: null,
+      },
       startsAt: {
         gte: new Date(),
       },

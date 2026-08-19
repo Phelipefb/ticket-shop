@@ -64,8 +64,13 @@ async function main() {
     where: { email: "organizer@ticketshop.dev" },
   });
 
-  const title = "Cine Horizonte: Sessão Especial";
+  const title = "A Origem: Sessão Especial";
   const startsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000);
+  const movieData = {
+    tmdbMovieId: 27205,
+    posterUrl: "https://image.tmdb.org/t/p/w500/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+    tmdbRating: 8.4,
+  };
 
   let event = await prisma.event.findFirst({
     where: { title },
@@ -78,11 +83,13 @@ async function main() {
         startsAt,
         organizerId: organizer.id,
         status: "PUBLISHED",
+        ...movieData,
       },
     });
   } else {
     event = await prisma.event.create({
       data: {
+        ...movieData,
         title,
         overview:
           "Uma sessão de demonstração para testar a compra de ingressos.",
