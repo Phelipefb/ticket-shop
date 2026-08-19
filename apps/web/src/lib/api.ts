@@ -3,6 +3,7 @@ export type PublicEvent = {
   title: string;
   overview: string | null;
   posterUrl: string | null;
+  tmdbRating: number | null;
   startsAt: string;
   venueName: string;
   venueAddress: string | null;
@@ -157,6 +158,21 @@ export async function updateEvent(
     const result = (await response.json()) as { message?: string };
     throw new Error(result.message ?? "Não foi possível atualizar o evento.");
   }
+}
+
+export type OrganizerEvent = Pick<PublicEvent, "id" | "title" | "startsAt" | "venueName" | "price" | "posterUrl"> & {
+  status: "DRAFT" | "PUBLISHED" | "CANCELLED";
+};
+
+export async function getMyEvents(accessToken: string): Promise<OrganizerEvent[]> {
+  const response = await fetch(`${apiUrl}/events/mine`, { headers: { Authorization: `Bearer ${accessToken}` } });
+  if (!response.ok) throw new Error("Não foi possível carregar seus eventos.");
+  return ((await response.json()) as { events: OrganizerEvent[] }).events;
+}
+
+export async function deleteEvent(accessToken: string, eventId: string) {
+  const response = await fetch(`${apiUrl}/events/${eventId}`, { method: "DELETE", headers: { Authorization: `Bearer ${accessToken}` } });
+  if (!response.ok) throw new Error("Não foi possível excluir o evento.");
 }
 
 export async function createReservation(
@@ -316,6 +332,7 @@ export type CatalogMovie = {
   overview: string | null;
   releaseDate: string | null;
   posterUrl: string | null;
+  tmdbRating: number;
 };
 
 export async function searchMovies(
@@ -354,6 +371,7 @@ export type CreateEventInput = {
   title: string;
   overview?: string;
   posterUrl?: string;
+  tmdbRating?: number;
   startsAt: string;
   venueName: string;
   venueAddress?: string;
@@ -390,7 +408,7 @@ export async function createEvent(
 }
 
 export type TicketValidation = {
-  result: "VALID" | "INVALID" | "EVENT_WRONG" | "ALREADY_USED";
+  result: "VALID" | "INVALID" | "EVENT_WRONG" | "EVENT_CANCELLED" | "ALREADY_USED";
   message: string;
   ticket?: {
     eventTitle: string;

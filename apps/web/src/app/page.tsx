@@ -1,5 +1,6 @@
 import { getPublishedEvents, type PublicEvent } from "@/lib/api";
 import { Header } from "@/components/header";
+import { EventCarousel } from "@/components/event-carousel";
 import { EventGrid } from "@/components/event-grid";
 
 export default async function Home() {
@@ -16,7 +17,9 @@ export default async function Home() {
     <main className="min-h-screen bg-[#101114] text-zinc-100">
       <Header />
 
-      <section className="mx-auto max-w-6xl px-6 pb-16 pt-20">
+      {!hasError ? <EventCarousel events={events} /> : null}
+
+      <section className="mx-auto max-w-6xl px-6 pb-16 pt-8">
         <p className="mb-4 text-sm font-semibold tracking-[0.2em] text-amber-400">
           PROGRAMAÇÃO
         </p>

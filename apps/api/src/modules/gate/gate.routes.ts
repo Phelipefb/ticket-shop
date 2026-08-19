@@ -41,6 +41,7 @@ gateRouter.post(
             event: {
               select: {
                 title: true,
+                status: true,
               },
             },
           },
@@ -82,6 +83,17 @@ gateRouter.post(
       return response.status(200).json({
         result: "EVENT_WRONG",
         message: "Este ingresso pertence a outro evento.",
+      });
+    }
+
+    if (ticket.reservation.event.status === "CANCELLED") {
+      await prisma.ticketValidation.create({
+        data: { ticketId: ticket.id, eventId, gatekeeperId, result: "EVENT_CANCELLED" },
+      });
+
+      return response.status(200).json({
+        result: "EVENT_CANCELLED",
+        message: "Este evento foi cancelado.",
       });
     }
 

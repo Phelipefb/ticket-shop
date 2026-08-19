@@ -42,6 +42,7 @@ enum TicketValidationResult {
   VALID
   INVALID
   EVENT_WRONG
+  EVENT_CANCELLED
   ALREADY_USED
 }
 
@@ -65,6 +66,7 @@ model Event {
   title        String
   overview     String?
   posterUrl    String?
+  tmdbRating   Float?
   startsAt     DateTime
   venueName    String
   venueAddress String?

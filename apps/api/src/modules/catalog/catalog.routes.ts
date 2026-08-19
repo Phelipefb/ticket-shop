@@ -51,6 +51,7 @@ catalogRouter.get(
           overview: string;
           release_date: string;
           poster_path: string | null;
+          vote_average: number;
         }>;
       };
 
@@ -62,6 +63,7 @@ catalogRouter.get(
         posterUrl: movie.poster_path
           ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
           : null,
+        tmdbRating: movie.vote_average,
       }));
 
       return response.status(200).json({ movies });

@@ -60,8 +60,18 @@ export function EventGrid({ events }: EventGridProps) {
           key={event.id}
           href={`/events/${event.id}`}
           data-event-card
-          className="block rounded-2xl border border-white/10 bg-zinc-900 p-6 transition hover:-translate-y-1 hover:border-amber-400/50"
+          className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 transition hover:-translate-y-1 hover:border-amber-400/50"
         >
+          {event.posterUrl ? (
+            <img
+              src={event.posterUrl}
+              alt={`Pôster de ${event.title}`}
+              className="mx-auto mt-5 h-auto w-1/2 rounded-xl bg-zinc-950 object-contain"
+              loading="lazy"
+            />
+          ) : null}
+
+          <div className="p-6">
           <div className="flex items-start justify-between gap-6">
             <div>
               <p className="text-sm font-medium text-amber-400">
@@ -88,6 +98,13 @@ export function EventGrid({ events }: EventGridProps) {
             <span className="rounded-full bg-white/5 px-3 py-1">
               {event.seatCount} assentos
             </span>
+
+            {event.tmdbRating !== null ? (
+              <span className="rounded-full bg-amber-400/10 px-3 py-1 text-amber-300">
+                ★ {event.tmdbRating.toFixed(1)} / 10
+              </span>
+            ) : null}
+          </div>
           </div>
         </Link>
       ))}

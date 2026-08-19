@@ -11,7 +11,7 @@
 <br />
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Status-Em%20desenvolvimento-1f2937?style=for-the-badge" alt="Status do projeto" />
+  <img src="https://img.shields.io/badge/Status-Conclu%C3%ADdo-16a34a?style=for-the-badge" alt="Status do projeto" />
   <img src="https://img.shields.io/badge/Node.js-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js 20 ou superior" />
   <img src="https://img.shields.io/badge/License-ISC-334155?style=for-the-badge" alt="Licença ISC" />
 </div>
@@ -40,16 +40,19 @@ O CinePass possui três perfis de acesso:
   <img src="https://img.shields.io/badge/PostgreSQL-16-4169e1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
   <img src="https://img.shields.io/badge/Prisma-7-2d3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ed?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Compose" />
+  <img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
+  <img src="https://img.shields.io/badge/Playwright-2ead33?style=for-the-badge&logo=playwright&logoColor=white" alt="Playwright" />
 </p>
 
-| Camada         | Tecnologias                               |
-| -------------- | ----------------------------------------- |
-| Frontend       | Next.js, React, TypeScript e Tailwind CSS |
-| Backend        | Node.js, Express e TypeScript             |
-| Persistência   | PostgreSQL e Prisma                       |
-| Segurança      | JWT e bcrypt                              |
-| Integrações    | TMDb, QR Code e leitura por câmera        |
-| Ambiente local | Docker Compose                            |
+| Camada         | Tecnologias                                                |
+| -------------- | ---------------------------------------------------------- |
+| Frontend       | Next.js, React, TypeScript, Tailwind CSS, shadcn/ui e GSAP |
+| Backend        | Node.js, Express e TypeScript                              |
+| Persistência   | PostgreSQL e Prisma                                        |
+| Segurança      | JWT e bcrypt                                               |
+| Integrações    | TMDb, QR Code e leitura por câmera                         |
+| Ambiente local | Docker Compose e Playwright                                |
+| Deploy         | Vercel, Render e Neon                                      |
 
 ---
 
@@ -68,13 +71,13 @@ docs/        # Documentação complementar
 
 ## Funcionalidades
 
-| Área         | Entregas                                                                              |
-| ------------ | ------------------------------------------------------------------------------------- |
-| Autenticação | Cadastro, login, JWT e controle de perfis.                                            |
-| Eventos      | Busca no TMDb, criação de sessões e mapa de assentos.                                 |
-| Compra       | Reserva temporária, pagamento aprovado ou recusado e proteção contra venda duplicada. |
-| Ingressos    | QR Code, código manual e link público somente leitura.                                |
-| Portaria     | Validação por câmera ou código, incluindo bloqueio de reutilização.                   |
+| Área         | Entregas                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------ |
+| Autenticação | Cadastro, login, JWT e controle de perfis.                                                       |
+| Eventos      | Busca no TMDb, criação e edição de sessões, com mapa de assentos.                                |
+| Compra       | Reserva temporária, cancelamento, pagamento aprovado/recusado e proteção contra venda duplicada. |
+| Ingressos    | QR Code, código manual e link público somente leitura.                                           |
+| Portaria     | Validação por câmera ou código, incluindo bloqueio de reutilização.                              |
 
 ---
 
@@ -156,6 +159,12 @@ A API roda em `http://localhost:3333` e o frontend em `http://localhost:3000`.
 | Cliente     | cliente2@ticketshop.dev  | Cliente456!   |
 | Portaria    | portaria@ticketshop.dev  | Portaria123!  |
 
+<p align="center">
+  <a href="https://ticket-shop-web.vercel.app/">
+    <img src="https://img.shields.io/badge/Link%20de%20demonstra%C3%A7%C3%A3o-Acessar%20aplica%C3%A7%C3%A3o-f59e0b?style=for-the-badge" alt="Link de demonstração da aplicação" />
+  </a>
+</p>
+
 ## Fluxos principais
 
 ### Cliente
@@ -179,7 +188,7 @@ Cartões de teste:
 1. Entrar como organizador.
 2. Buscar filme no TMDb.
 3. Preencher sessão, local, preço e mapa de assentos.
-4. Publicar o evento.
+4. Publicar ou editar o evento criado.
 
 ### Portaria
 
@@ -200,6 +209,7 @@ Resultados possíveis:
 - Apenas organizadores criam eventos.
 - Apenas clientes reservam assentos e efetuam pagamentos.
 - Reservas pendentes expiram após 10 minutos.
+- O cliente pode cancelar uma reserva pendente ao sair do checkout.
 - Um assento não pode ser reservado ou vendido duas vezes.
 - Pagamento recusado libera o assento.
 - Pagamento aprovado gera ingresso com código e QR Code.
@@ -217,7 +227,7 @@ Após criar e migrar esse banco, conforme a configuração local de testes, exec
 npm run test -w api
 ```
 
-Os testes cobrem a rota de saúde, a prevenção de reserva duplicada, os dois resultados de pagamento e a validação única de ingresso na portaria.
+Os testes cobrem saúde, permissões, reserva duplicada, pagamento aprovado/recusado, validação única, evento incorreto e histórico da portaria. Atualmente, a API possui 5 arquivos de teste e 9 cenários automatizados.
 
 ## Build de produção
 
@@ -243,11 +253,6 @@ https://www.themoviedb.org/
 
 ---
 
-## Demonstração online
-
-- Frontend: https://ticket-shop-web.vercel.app/
-- API: https://ticket-shop-api.onrender.com/health
-
 ## Verificação de qualidade
 
 Execute os testes da API com:
@@ -260,6 +265,7 @@ Para executar o fluxo E2E no navegador, primeiro encerre qualquer processo de
 `next dev` aberto na pasta `apps/web`. Em seguida, execute:
 
 ```bash
+npx playwright install chromium
 npm run test:e2e
 ```
 

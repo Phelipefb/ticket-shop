@@ -37,6 +37,7 @@ function getResultTitle(result: TicketValidation["result"]) {
   if (result === "VALID") return "Entrada liberada";
   if (result === "ALREADY_USED") return "Ingresso já utilizado";
   if (result === "EVENT_WRONG") return "Ingresso de outro evento";
+  if (result === "EVENT_CANCELLED") return "Evento cancelado";
 
   return "Ingresso inválido";
 }

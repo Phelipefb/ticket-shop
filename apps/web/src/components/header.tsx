@@ -58,10 +58,10 @@ export function Header() {
 
             {user.role === "ORGANIZER" ? (
               <Link
-                href="/organizer/events/new"
+                href="/organizer/events"
                 className="hidden text-sm font-medium text-zinc-300 transition hover:text-amber-300 sm:block"
               >
-                Criar evento
+                Meus eventos
               </Link>
             ) : null}
 

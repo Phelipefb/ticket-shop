@@ -10,6 +10,7 @@ const createEventSchema = z.object({
   title: z.string().trim().min(1).max(200),
   overview: z.string().trim().max(2000).optional(),
   posterUrl: z.string().url().optional(),
+  tmdbRating: z.coerce.number().min(0).max(10).optional(),
   startsAt: z.coerce.date().refine((date) => date > new Date(), {
     message: "A data da sessão deve estar no futuro.",
   }),
@@ -52,6 +53,7 @@ eventsRouter.post(
       title,
       overview,
       posterUrl,
+      tmdbRating,
       startsAt,
       venueName,
       venueAddress,
@@ -82,6 +84,7 @@ eventsRouter.post(
           title,
           overview,
           posterUrl,
+          tmdbRating,
           startsAt,
           venueName,
           venueAddress,
@@ -146,6 +149,24 @@ eventsRouter.patch(
       });
     }
 
+    const changesCriticalData = ["startsAt", "venueName", "venueAddress", "price"]
+      .some((field) => field in validation.data);
+
+    if (changesCriticalData) {
+      const reservationsCount = await prisma.reservation.count({
+        where: {
+          eventId: event.id,
+          status: { in: ["PENDING_PAYMENT", "CONFIRMED"] },
+        },
+      });
+
+      if (reservationsCount > 0) {
+        return response.status(409).json({
+          message: "Não é possível alterar data, local ou preço após iniciar vendas.",
+        });
+      }
+    }
+
     const updatedEvent = await prisma.event.update({
       where: { id: event.id },
       data: validation.data,
@@ -154,6 +175,48 @@ eventsRouter.patch(
     return response.status(200).json({
       event: { ...updatedEvent, price: updatedEvent.price.toNumber() },
     });
+  },
+);
+
+eventsRouter.get(
+  "/mine",
+  authenticate,
+  authorize("ORGANIZER"),
+  async (request, response) => {
+    const organizerId = request.auth?.userId;
+
+    if (!organizerId) {
+      return response.status(401).json({ message: "Usuário não autenticado." });
+    }
+
+    const events = await prisma.event.findMany({
+      where: { organizerId },
+      orderBy: { startsAt: "asc" },
+      select: {
+        id: true, title: true, startsAt: true, venueName: true,
+        price: true, status: true, posterUrl: true,
+      },
+    });
+
+    return response.json({
+      events: events.map((event) => ({ ...event, price: event.price.toNumber() })),
+    });
+  },
+);
+
+eventsRouter.delete(
+  "/:eventId",
+  authenticate,
+  authorize("ORGANIZER"),
+  async (request, response) => {
+    const organizerId = request.auth?.userId;
+    const eventId = Array.isArray(request.params.eventId) ? request.params.eventId[0] : request.params.eventId;
+    const event = await prisma.event.findFirst({ where: { id: eventId, organizerId } });
+
+    if (!event) return response.status(404).json({ message: "Evento não encontrado." });
+
+    await prisma.event.update({ where: { id: event.id }, data: { status: "CANCELLED" } });
+    return response.status(204).send();
   },
 );
 
@@ -173,6 +236,7 @@ eventsRouter.get("/", async (_request, response) => {
       title: true,
       overview: true,
       posterUrl: true,
+      tmdbRating: true,
       startsAt: true,
       venueName: true,
       venueAddress: true,
@@ -213,6 +277,7 @@ eventsRouter.get("/:eventId", async (request, response) => {
       title: true,
       overview: true,
       posterUrl: true,
+      tmdbRating: true,
       startsAt: true,
       venueName: true,
       venueAddress: true,

@@ -85,6 +85,7 @@ export default function NewEventPage() {
         title,
         overview: overview || undefined,
         posterUrl: selectedMovie?.posterUrl ?? undefined,
+        tmdbRating: selectedMovie?.tmdbRating,
         startsAt: new Date(startsAt).toISOString(),
         venueName,
         venueAddress: venueAddress || undefined,
